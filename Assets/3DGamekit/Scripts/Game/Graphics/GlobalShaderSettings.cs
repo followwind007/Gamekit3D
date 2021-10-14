@@ -22,15 +22,23 @@ namespace Gamekit3D
         [SerializeField]
         float FresnelPower = 0.5f;
 
-        void Update()
+        private static readonly int Scale = Shader.PropertyToID("_TopScale");
+        private static readonly int TopNormal2Scale = Shader.PropertyToID("_TopNormal2Scale");
+        private static readonly int Amount = Shader.PropertyToID("_NoiseAmount");
+        private static readonly int NoiseFallOff = Shader.PropertyToID("_NoiseFallOff");
+        private static readonly int NoiseScaleProp = Shader.PropertyToID("_noiseScale");
+        private static readonly int FresnelAmountProp = Shader.PropertyToID("_FresnelAmount");
+        private static readonly int Power = Shader.PropertyToID("_FresnelPower");
+
+        private void Update()
         {
-            Shader.SetGlobalFloat("_TopScale", TopScale);
-            Shader.SetGlobalFloat("_TopNormal2Scale", NormalDetailScale);
-            Shader.SetGlobalFloat("_NoiseAmount", NoiseAmount);
-            Shader.SetGlobalFloat("_NoiseFallOff", NoiseFalloff);
-            Shader.SetGlobalFloat("_noiseScale", NoiseScale);
-            Shader.SetGlobalFloat("_FresnelAmount", FresnelAmount);
-            Shader.SetGlobalFloat("_FresnelPower", FresnelPower);
+            Shader.SetGlobalFloat(Scale, TopScale);
+            Shader.SetGlobalFloat(TopNormal2Scale, NormalDetailScale);
+            Shader.SetGlobalFloat(Amount, NoiseAmount);
+            Shader.SetGlobalFloat(NoiseFallOff, NoiseFalloff);
+            Shader.SetGlobalFloat(NoiseScaleProp, NoiseScale);
+            Shader.SetGlobalFloat(FresnelAmountProp, FresnelAmount);
+            Shader.SetGlobalFloat(Power, FresnelPower);
         }
     } 
 }
