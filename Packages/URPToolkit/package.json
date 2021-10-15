@@ -1,0 +1,14 @@
+{
+  "name": "com.unity.urptoolkit",
+  "version": "1.2.3",
+  "displayName": "URPToolkit",
+  "description": "This is an local package",
+  "unity": "2019.1",
+  "unityRelease": "0b5",
+  "keywords": [],
+  "author": {
+    "name": "Unity",
+    "email": "unity@unity.com",
+    "url": "https://www.unity3d.com"
+  }
+}
