@@ -19,8 +19,17 @@ namespace GameApp.URPToolkit
     {
     }
 
+    public class ShaderInclude : ShaderBase
+    {
+    }
+
     public class ShaderTag : ShaderBase
     {
+    }
+
+    public class ShaderTags : ShaderBase
+    {
+        public List<ShaderTag> tags = new();
     }
 
     public class ShaderLod : ShaderBase
