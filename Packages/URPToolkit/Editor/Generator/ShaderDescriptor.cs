@@ -9,6 +9,12 @@ namespace GameApp.URPToolkit
 
     public class ShaderProperty : ShaderBase
     {
+        public List<string> attributes;
+        public string name;
+        public string displayName;
+        public string type;
+        public string value;
+        public string valueExt;
     }
 
     public class VarProperty : ShaderBase

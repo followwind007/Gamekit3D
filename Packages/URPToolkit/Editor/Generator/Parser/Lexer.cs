@@ -1104,6 +1104,10 @@ namespace GameApp.URPToolkit.Parser
 
         public int LinePosition => startPosition - lineBegin;
         public int EndLinePosition => endPosition - endLineBegin;
+
+        public bool IsChar(string str) => type == TokenType.Char && text == str;
+        public bool IsIdentifier(string str) => type == TokenType.Identifier && text == str;
+        public bool IsNumber => type == TokenType.Decimal || type == TokenType.Integer;
     }
 
     public sealed class LexerSettings : ICloneable
