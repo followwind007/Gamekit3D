@@ -31,6 +31,8 @@ namespace GameApp.URPToolkit
 
     public class ShaderTag : ShaderBase
     {
+        public string key;
+        public string value;
     }
 
     public class ShaderTags : ShaderBase
@@ -40,6 +42,31 @@ namespace GameApp.URPToolkit
 
     public class ShaderLod : ShaderBase
     {
+    }
+
+    public class PassName : ShaderBase
+    {
+    }
+
+    public class ShaderBlend : ShaderBase
+    {
+        public List<string> blends = new();
+    }
+
+    public class ShaderZWrite : ShaderBase
+    {
+        public List<string> writes = new();
+    }
+
+    public class ShaderCull : ShaderBase
+    {
+        public List<string> culls = new();
+    }
+
+    public class ShaderKeyword : ShaderBase
+    {
+        public string name;
+        public List<string> keywords;
     }
 
     public class ShaderStruct : ShaderBase
@@ -55,28 +82,26 @@ namespace GameApp.URPToolkit
     {
     }
 
-    public class CgProgram
+    public class ShaderHlsl : ShaderBase
     {
-        public List<ShaderPragma> pragms = new();
-        public List<VarProperty> properties = new();
-        
-        public ShaderStruct attributes;
-        public ShaderFunction vertexFunc;
-        
-        public ShaderStruct varings;
-        public ShaderFunction fragFunc;
+    }
+
+    public class ShaderPass : ShaderBase
+    {
+        public List<ShaderBase> vals = new();
     }
 
     public class SubShader
     {
-        public List<ShaderTag> tags = new();
-        public ShaderLod shaderLod;
-        public CgProgram cgProgram = new();
+        public List<ShaderBase> vals = new();
     }
 
-    public class ShaderFallback
+    public class ShaderFallback : ShaderBase
     {
-        public string content;
+    }
+
+    public class ShaderCustomEditor : ShaderBase
+    {
     }
     
     public class ShaderDescriptor
@@ -87,5 +112,6 @@ namespace GameApp.URPToolkit
         public List<SubShader> subShaders = new();
 
         public ShaderFallback fallback;
+        public ShaderCustomEditor customEditor;
     }
 }

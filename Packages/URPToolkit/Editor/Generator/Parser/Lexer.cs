@@ -1107,7 +1107,10 @@ namespace GameApp.URPToolkit.Parser
 
         public bool IsChar(string str) => type == TokenType.Char && text == str;
         public bool IsIdentifier(string str) => type == TokenType.Identifier && text == str;
+        public bool IsIdentifier() => type == TokenType.Identifier;
         public bool IsNumber => type == TokenType.Decimal || type == TokenType.Integer;
+        public bool IsQuotedString => type == TokenType.QuotedString;
+        public bool IsEnd => type == TokenType.End;
     }
 
     public sealed class LexerSettings : ICloneable

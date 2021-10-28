@@ -40,5 +40,15 @@ namespace GameApp.URPToolkit
                 Debug.Log($"{tk.lineNumber + 1}:\t{tk.type}: {tk.text}");
             }
         }
+        
+        [MenuItem("Assets/TestParser", false, 3002)]
+        public static void TestParser()
+        {
+            var sel = Selection.activeObject;
+            if (sel == null) return;
+            var path = AssetDatabase.GetAssetPath(sel);
+            var parser = new ShaderParser(path);
+            parser.Parse();
+        }
     }
 }
