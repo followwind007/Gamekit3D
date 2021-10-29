@@ -48,19 +48,29 @@ namespace GameApp.URPToolkit
     {
     }
 
-    public class ShaderBlend : ShaderBase
+    public class ShaderMultiValBase : ShaderBase
     {
-        public List<string> blends = new();
+        public List<string> vals = new();
     }
 
-    public class ShaderZWrite : ShaderBase
+    public class ShaderBlend : ShaderMultiValBase
     {
-        public List<string> writes = new();
     }
 
-    public class ShaderCull : ShaderBase
+    public class ShaderZWrite : ShaderMultiValBase
     {
-        public List<string> culls = new();
+    }
+
+    public class ShaderZTest : ShaderMultiValBase
+    {
+    }
+
+    public class ShaderCull : ShaderMultiValBase
+    {
+    }
+
+    public class ShaderColorMask : ShaderMultiValBase
+    {
     }
 
     public class ShaderKeyword : ShaderBase

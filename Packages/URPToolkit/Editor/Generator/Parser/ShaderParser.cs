@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 
 namespace GameApp.URPToolkit.Parser
 {
@@ -16,7 +17,9 @@ namespace GameApp.URPToolkit.Parser
                 Name = "Name",
                 Blend = "Blend",
                 ZWrite = "ZWrite",
+                ZTest = "ZTest",
                 Cull = "Cull",
+                ColorMask = "ColorMask",
                 HlslBegin = "HLSLPROGRAM",
                 Tags = "Tags",
                 Lod = "LOD",
@@ -66,6 +69,32 @@ namespace GameApp.URPToolkit.Parser
         private ShaderPass _curShaderPass;
 
         private string _content;
+        
+        private HashSet<string> _keywords;
+        private HashSet<string> Keywords
+        {
+            get
+            {
+                if (_keywords == null)
+                {
+                    _keywords = new HashSet<string>();
+                    var t = typeof(Keys);
+                    var ps = t.GetFields(BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy);
+                    
+                    foreach (var info in ps)
+                    {
+                        if (info.GetRawConstantValue() is string val)
+                        {
+                            _keywords.Add(val);
+                        }
+                    }
+                }
+                return _keywords;
+            }
+        }
+
+        private bool IsKeyword(string text) => Keywords.Contains(text);
+        private Token NextToken => GetNextValid();
 
         public ShaderParser(string sourcePath)
         {
@@ -103,9 +132,12 @@ namespace GameApp.URPToolkit.Parser
             ReadNextIdentifier(Keys.Properties);
             ToPropertyState();
             
-            ReadNextIdentifier(Keys.SubShader);
-            ToSubShaderState();
-            
+            while (NextToken.IsIdentifier(Keys.SubShader))
+            {
+                ReadNextIdentifier(Keys.SubShader);
+                ToSubShaderState();
+            }
+
             ToFinalState();
         }
         
@@ -229,6 +261,25 @@ namespace GameApp.URPToolkit.Parser
             if (assert) throw new ParseException(this,$"Expect Number but found {Cur.type} '{Cur.text}'!");
 
             return false;
+        }
+
+        private void ReadNextNumberOrIndentifier(out string val, bool assert = true)
+        {
+            val = "";
+            var tk = NextToken;
+            if (tk.IsChar(Chars.Minus))
+            {
+                ReadNextNumber(out val, assert);
+                return;
+            }
+            else if(tk.IsNumber || tk.IsIdentifier())
+            {
+                ReadUntilNextValid();
+                val = Cur.text;
+                return;
+            }
+
+            if (assert) throw new ParseException(this, $"Except Number or Identifier but found {tk.type} '{tk.text}'!");
         }
         
         private void ReadUntilNextValid(bool assert = true)

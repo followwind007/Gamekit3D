@@ -86,8 +86,7 @@ namespace GameApp.URPToolkit.Parser
 
         private string ReadPropertyValueExt()
         {
-            var tk = GetNextValid();
-            if (tk.IsChar(Chars.BraceL3))
+            if (NextToken.IsChar(Chars.BraceL3))
             {
                 var val = "";
                 ReadNextChar(Chars.BraceL3);
