@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace GameApp.URPToolkit
 {
@@ -84,7 +85,7 @@ namespace GameApp.URPToolkit
         public List<StructProperty> properties = new();
     }
 
-    public class ShaderPragma : ShaderBase
+    public class ShaderPragma : ShaderMultiValBase
     {
     }
 
@@ -94,6 +95,7 @@ namespace GameApp.URPToolkit
 
     public class ShaderHlsl : ShaderBase
     {
+        public List<ShaderBase> vals = new();
     }
 
     public class ShaderPass : ShaderBase
@@ -123,5 +125,18 @@ namespace GameApp.URPToolkit
 
         public ShaderFallback fallback;
         public ShaderCustomEditor customEditor;
+
+        public List<ShaderPass> GetPass(string name)
+        {
+            var passes = new List<ShaderPass>();
+            foreach (var subShader in subShaders)
+            {
+                var sb = subShader.vals.FirstOrDefault(sbVal =>
+                    sbVal is ShaderPass sp && sp.vals.Any(spv => spv is PassName pn && pn.content == name));
+                if (sb is ShaderPass pass) passes.Add(pass);
+            }
+
+            return passes;
+        }
     }
 }

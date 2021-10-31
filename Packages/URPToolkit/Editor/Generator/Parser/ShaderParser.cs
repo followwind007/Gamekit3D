@@ -101,7 +101,7 @@ namespace GameApp.URPToolkit.Parser
             _sourcePath = sourcePath;
         }
 
-        public string Parse()
+        public ShaderDescriptor Parse()
         {
             _idx = 0;
             _descriptor = new ShaderDescriptor();
@@ -118,7 +118,7 @@ namespace GameApp.URPToolkit.Parser
 
             ToShaderState();
 
-            return default;
+            return _descriptor;
         }
 
         private void ToShaderState()

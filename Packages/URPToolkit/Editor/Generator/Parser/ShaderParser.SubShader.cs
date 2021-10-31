@@ -91,11 +91,22 @@ namespace GameApp.URPToolkit.Parser
 
         private void ToHlslState()
         {
+            var startIdx = _idx;
+            var hlsl = new ShaderHlsl();
             var hlslStart = Cur.startPosition;
             ReadUntilIdentifier(Keys.HlslEnd);
+            for (var i = startIdx + 1; i < _idx; i++)
+            {
+                var tk = _tokens[i];
+                if (tk.IsIdentifier(Keys.Pragma))
+                {
+                    var pragma = new ShaderPragma { vals = ReadBrace2_s() };
+                    hlsl.vals.Add(pragma);
+                }
+            }
             var hlslEnd = Cur.endPosition;
-            var hlslContent = _content.Substring(hlslStart, hlslEnd - hlslStart);
-            CurPassVals.Add(new ShaderHlsl { content = hlslContent });
+            hlsl.content = _content.Substring(hlslStart, hlslEnd - hlslStart);
+            CurPassVals.Add(hlsl);
         }
 
         private List<ShaderTag> ReadTags()

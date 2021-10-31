@@ -47,8 +47,9 @@ namespace GameApp.URPToolkit
             var sel = Selection.activeObject;
             if (sel == null) return;
             var path = AssetDatabase.GetAssetPath(sel);
-            var parser = new ShaderParser(path);
-            parser.Parse();
+            var destPath = path.Replace(".shader", ".gen.shader");
+            var generator = new ShaderGenerator(path, destPath);
+            generator.Generate();
         }
     }
 }
