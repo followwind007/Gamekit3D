@@ -1,11 +1,17 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace GameApp.URPToolkit
 {
     public class ShaderBase
     {
         public string content;
+
+        public virtual void Generate(StringBuilder sb, int indent)
+        {
+            sb.AppendIndent(content, indent);
+        }
     }
 
     public class ShaderProperty : ShaderBase
@@ -16,6 +22,25 @@ namespace GameApp.URPToolkit
         public string type;
         public string value;
         public string valueExt;
+
+        public override void Generate(StringBuilder sb, int indent)
+        {
+            sb.AppendIndent(indent);
+            foreach (var attr in attributes)
+            {
+                sb.Append($"[{attr}]");
+            }
+            
+            sb.Append($"{name}({displayName}, {type}) = {value}");
+            if (!string.IsNullOrEmpty(valueExt))
+            {
+                sb.AppendLine($" {valueExt}");
+            }
+            else
+            {
+                sb.AppendLine();
+            }
+        }
     }
 
     public class VarProperty : ShaderBase
@@ -137,6 +162,20 @@ namespace GameApp.URPToolkit
             }
 
             return passes;
+        }
+
+        public void GenProperty(StringBuilder sb, int indent)
+        {
+            sb.AppendLineIndent("Properties", indent);
+            sb.AppendLineIndent("{", indent);
+            indent++;
+            foreach (var p in properties)
+            {
+                p.Generate(sb, indent);
+            }
+
+            indent--;
+            sb.AppendLineIndent("}", indent);
         }
     }
 }

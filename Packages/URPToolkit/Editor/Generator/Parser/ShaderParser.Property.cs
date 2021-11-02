@@ -62,6 +62,7 @@ namespace GameApp.URPToolkit.Parser
             if (Cur.IsIdentifier(PropType.Range))
             {
                 var sb = new StringBuilder();
+                sb.Append(Cur.text);
                 ReadNextChar(Chars.BraceL1);
                 sb.Append(Cur.text);
                 ReadNextNumber(out var r1);
@@ -79,9 +80,26 @@ namespace GameApp.URPToolkit.Parser
 
         private string ReadPropertyValue()
         {
-            if (ReadNextNumber(out var num, false)) return num;
-            if (Cur.IsQuotedString) return Cur.text;
-            throw new ParseException(this,$"Expected value description but found {Cur.type} '{Cur.value}'!");
+            var tk = NextToken;
+            if (tk.IsChar(Chars.BraceL1))
+            {
+                ReadNextChar(Chars.BraceL1);
+                var startIdx = Cur.startPosition;
+                ReadUntilChar(Chars.BraceR1);
+                var endIdx = Cur.endPosition;
+                return _content.Substring(startIdx, endIdx - startIdx);
+            }
+            else if (tk.IsNumber || tk.IsChar(Chars.Minus))
+            {
+                ReadNextNumber(out var num, false); 
+                return num;
+            }
+            else if (tk.IsQuotedString)
+            {
+                ReadNextQuotedString();
+                return Cur.text;
+            }
+            throw new ParseException(this,$"Expected value description but found {Cur.type} '{Cur.text}'!");
         }
 
         private string ReadPropertyValueExt()

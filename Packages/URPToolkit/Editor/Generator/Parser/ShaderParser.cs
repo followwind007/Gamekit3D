@@ -169,7 +169,7 @@ namespace GameApp.URPToolkit.Parser
             for (var i = _idx + 1; i < TokenLen; i++)
             {
                 var tk = _tokens[i];
-                if (tk.type == TokenType.Identifier && tk.text == identifier)
+                if (tk.IsIdentifier(identifier))
                 {
                     _idx = i;
                     return;
@@ -184,7 +184,7 @@ namespace GameApp.URPToolkit.Parser
             ReadUntilNextValid();
             
             var tk = Cur;
-            if (tk.type == TokenType.Identifier)
+            if (tk.IsIdentifier())
             {
                 return;
             }
@@ -197,7 +197,7 @@ namespace GameApp.URPToolkit.Parser
             ReadUntilNextValid();
             
             var tk = Cur;
-            if (tk.type == TokenType.Identifier && tk.text == identifier)
+            if (tk.IsIdentifier(identifier))
             {
                 return;
             }
@@ -217,6 +217,21 @@ namespace GameApp.URPToolkit.Parser
             if (assert) throw new ParseException(this,$"Can not find next token type '{type}'!");
             
             return false;
+        }
+        
+        private void ReadUntilChar(string c, bool assert = true)
+        {
+            for (var i = _idx + 1; i < TokenLen; i++)
+            {
+                var tk = _tokens[i];
+                if (tk.IsChar(c))
+                {
+                    _idx = i;
+                    return;
+                }
+            }
+
+            if (assert) throw new ParseException(this,$"Can not find '{c}' Char!");
         }
 
         private void ReadNextChar(string c, bool assert = true)

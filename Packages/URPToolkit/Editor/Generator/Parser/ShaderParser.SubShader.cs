@@ -19,18 +19,12 @@ namespace GameApp.URPToolkit.Parser
             {
                 switch (Cur.text)
                 {
-                    case Keys.Tags:
-                        _curSubShader.vals.Add(new ShaderTags { tags = ReadTags() });
-                        break;
-                    case Keys.Lod:
-                        ReadNextNumber(out var num);
-                        _curSubShader.vals.Add(new ShaderLod { content = num });
-                        break;
                     case Keys.Pass:
                         ToPassState();
                         break;
                     default:
-                        throw new ParseException(this, $"Unresolved symbol {Cur.type} '{Cur.text}'!");
+                        TryMatchShaderKeyword(_curSubShader.vals);
+                        break;
                 }
 
                 ReadUntilNextValid();
@@ -56,36 +50,50 @@ namespace GameApp.URPToolkit.Parser
 
                 switch (Cur.text)
                 {
-                    case Keys.Tags:
-                        CurPassVals.Add(new ShaderTags { tags = ReadTags() });
-                        break;
                     case Keys.Name:
                         ReadNextQuotedString();
                         CurPassVals.Add(new PassName { content = Cur.text});
-                        break;
-                    case Keys.Blend:
-                        CurPassVals.Add(new ShaderBlend { vals = ReadBrace2_s() });
-                        break;
-                    case Keys.ZWrite:
-                        CurPassVals.Add(new ShaderZWrite { vals = ReadBrace2_s() });
-                        break;
-                    case Keys.ZTest:
-                        CurPassVals.Add(new ShaderZTest { vals = ReadBrace2_s() });
-                        break;
-                    case Keys.Cull:
-                        CurPassVals.Add(new ShaderCull { vals = ReadBrace2_s() });
-                        break;
-                    case Keys.ColorMask:
-                        CurPassVals.Add(new ShaderColorMask {vals = ReadBrace2_s() } );
                         break;
                     case Keys.HlslBegin:
                         ToHlslState();
                         break;
                     default:
-                        throw new ParseException(this, $"Unexpected pass symbol {Cur.type} '{Cur.text}'!");
+                        TryMatchShaderKeyword(CurPassVals);
+                        break;
                 }
                 
                 ReadUntilNextValid();
+            }
+        }
+
+        private void TryMatchShaderKeyword(List<ShaderBase> list)
+        {
+            switch (Cur.text)
+            {
+                case Keys.Tags:
+                    list.Add(new ShaderTags { tags = ReadTags() });
+                    break;
+                case Keys.Lod:
+                    ReadNextNumber(out var num);
+                    list.Add(new ShaderLod { content = num });
+                    break;
+                case Keys.Blend:
+                    list.Add(new ShaderBlend { vals = ReadBrace2_s() });
+                    break;
+                case Keys.ZWrite:
+                    list.Add(new ShaderZWrite { vals = ReadBrace2_s() });
+                    break;
+                case Keys.ZTest:
+                    list.Add(new ShaderZTest { vals = ReadBrace2_s() });
+                    break;
+                case Keys.Cull:
+                    list.Add(new ShaderCull { vals = ReadBrace2_s() });
+                    break;
+                case Keys.ColorMask:
+                    list.Add(new ShaderColorMask {vals = ReadBrace2_s() });
+                    break;
+                default:
+                    throw new ParseException(this, $"Unexpected pass symbol {Cur.type} '{Cur.text}'!");
             }
         }
 
@@ -95,15 +103,19 @@ namespace GameApp.URPToolkit.Parser
             var hlsl = new ShaderHlsl();
             var hlslStart = Cur.startPosition;
             ReadUntilIdentifier(Keys.HlslEnd);
+            var endIdx = _idx;
             for (var i = startIdx + 1; i < _idx; i++)
             {
                 var tk = _tokens[i];
+                _idx = i;
                 if (tk.IsIdentifier(Keys.Pragma))
                 {
                     var pragma = new ShaderPragma { vals = ReadBrace2_s() };
                     hlsl.vals.Add(pragma);
                 }
             }
+
+            _idx = endIdx;
             var hlslEnd = Cur.endPosition;
             hlsl.content = _content.Substring(hlslStart, hlslEnd - hlslStart);
             CurPassVals.Add(hlsl);
