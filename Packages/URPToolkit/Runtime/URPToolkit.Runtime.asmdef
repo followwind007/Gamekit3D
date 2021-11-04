@@ -1,12 +1,8 @@
 {
-    "name": "URPToolkit.Editor",
+    "name": "URPToolkit.Runtime",
     "rootNamespace": "",
-    "references": [
-        "GUID:3437995ac39d9114abd6560f17af8c90"
-    ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "references": [],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": true,
     "overrideReferences": false,

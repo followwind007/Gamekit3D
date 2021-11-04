@@ -17,7 +17,7 @@ namespace GameApp.URPToolkit
         public void Generate()
         {
             var parser = new ShaderParser(_sourcePath);
-            _descriptor = parser.Parse();
+            _descriptor = parser.ParseShader();
             
             
         }

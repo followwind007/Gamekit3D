@@ -5,48 +5,63 @@ using System.Reflection;
 
 namespace GameApp.URPToolkit.Parser
 {
+    public readonly struct Keys
+    {
+        public const string
+            Shader = "Shader",
+            Properties = "Properties",
+            SubShader = "SubShader",
+            Pass = "Pass",
+            Name = "Name",
+            Blend = "Blend",
+            ZWrite = "ZWrite",
+            ZTest = "ZTest",
+            Cull = "Cull",
+            ColorMask = "ColorMask",
+            HlslBegin = "HLSLPROGRAM",
+            Tags = "Tags",
+            Lod = "LOD",
+            Pragma = "pragma",
+            Include = "include",
+            Struct = "struct",
+            Function = "function",
+            HlslEnd = "ENDHLSL",
+            FallBack = "FallBack",
+            CustomEditor = "CustomEditor",
+            Ifndef = "ifndef",
+            Ifdef = "ifdef",
+            Define = "define",
+            Defined = "defined",
+            Else = "else",
+            EndIf = "endif";
+    }
+        
+    public readonly struct Chars
+    {
+        public const string
+            BraceL1 = "(",
+            BraceR1 = ")",
+            BraceL2 = "[",
+            BraceR2 = "]",
+            BraceL3 = "{",
+            BraceR3 = "}",
+            Minus = "-",
+            Equal = "=",
+            Hash = "#",
+            Space = " ",
+            SemiColon = ";",
+            Comma = ",";
+    }
+
+    public readonly struct PragmaKeys
+    {
+        public const string
+           Vertex = "vertex", 
+           Fragment = "fragment";
+    }
+    
     public partial class ShaderParser
     {
-        public readonly struct Keys
-        {
-            public const string
-                Shader = "Shader",
-                Properties = "Properties",
-                SubShader = "SubShader",
-                Pass = "Pass",
-                Name = "Name",
-                Blend = "Blend",
-                ZWrite = "ZWrite",
-                ZTest = "ZTest",
-                Cull = "Cull",
-                ColorMask = "ColorMask",
-                HlslBegin = "HLSLPROGRAM",
-                Tags = "Tags",
-                Lod = "LOD",
-                Pragma = "pragma",
-                Include = "include",
-                Struct = "struct",
-                Function = "function",
-                HlslEnd = "ENDHLSL",
-                Fallback = "Fallback",
-                CustomEditor = "CustomEditor";
-        }
-        
-        public readonly struct Chars
-        {
-            public const string
-                BraceL1 = "(",
-                BraceR1 = ")",
-                BraceL2 = "[",
-                BraceR2 = "]",
-                BraceL3 = "{",
-                BraceR3 = "}",
-                Minus = "-",
-                Equal = "=",
-                Hash = "#",
-                Comma = ",";
-        }
-        
         public readonly struct PropType
         {
             public const string
@@ -101,11 +116,18 @@ namespace GameApp.URPToolkit.Parser
             _sourcePath = sourcePath;
         }
 
-        public ShaderDescriptor Parse()
+        public ShaderDescriptor ParseShader()
+        {
+            _descriptor = new ShaderDescriptor();
+            InitToken();
+            ToShaderState();
+            return _descriptor;
+        }
+
+        private void InitToken()
         {
             _idx = 0;
-            _descriptor = new ShaderDescriptor();
-            
+
             _content = File.ReadAllText(_sourcePath);
             var lexer = new Lexer(_content);
             _tokens = new List<Token> { lexer.Current };
@@ -115,10 +137,6 @@ namespace GameApp.URPToolkit.Parser
                 _tokens.Add(tk);
                 if (tk.type == TokenType.End) break;
             }
-
-            ToShaderState();
-
-            return _descriptor;
         }
 
         private void ToShaderState()
@@ -144,15 +162,16 @@ namespace GameApp.URPToolkit.Parser
         private void ToFinalState()
         {
             ReadUntilNextValid();
-            while (Cur.IsChar(Chars.BraceR3))
+            while (!Cur.IsChar(Chars.BraceR3))
             {
                 switch (Cur.text)
                 {
-                    case Keys.Fallback:
+                    case Keys.FallBack:
                         ReadNextQuotedString();
                         _descriptor.fallback = new ShaderFallback { content = Cur.text };
                         break;
                     case Keys.CustomEditor:
+                        ReadNextQuotedString();
                         _descriptor.customEditor = new ShaderCustomEditor { content = Cur.text };
                         break;
                     default:
@@ -257,7 +276,7 @@ namespace GameApp.URPToolkit.Parser
             if (assert) throw new ParseException(this,$"Expect QuotedString but found {Cur.type} '{Cur.text}'!");
         }
 
-        private bool ReadNextNumber(out string val, bool assert = true)
+        private void ReadNextNumber(out string val, bool assert = true)
         {
             ReadUntilNextValid();
             val = "";
@@ -270,12 +289,10 @@ namespace GameApp.URPToolkit.Parser
             if (Cur.IsNumber)
             {
                 val += Cur.text;
-                return true;
+                return;
             }
             
             if (assert) throw new ParseException(this,$"Expect Number but found {Cur.type} '{Cur.text}'!");
-
-            return false;
         }
 
         private void ReadNextNumberOrIndentifier(out string val, bool assert = true)
@@ -310,6 +327,11 @@ namespace GameApp.URPToolkit.Parser
             if (assert) throw new ParseException(this,"Can not find next valid token!");
         }
 
+        private void ReadUnitilEnd()
+        {
+            _idx = TokenLen - 1;
+        }
+
         private Token GetNextValid(bool assert = true)
         {
             var i = _GetNextValidIdx();
@@ -323,22 +345,47 @@ namespace GameApp.URPToolkit.Parser
             return default;
         }
 
+        private bool GetNextValids(int count, out List<Token> tokens, bool assert = true)
+        {
+            tokens = new List<Token>();
+            for (var i = _idx + 1; i < TokenLen; i++)
+            {
+                if (!_IsValidToken(i)) continue;
+                tokens.Add(_tokens[i]);
+                if (tokens.Count == count) return true;
+            }
+
+            if (assert) throw new ParseException(this, $"Can not find next {count} valid token!");
+            
+            return false;
+        }
+
         private int _GetNextValidIdx()
         {
             int i;
             for (i = _idx + 1; i < TokenLen; i++)
             {
-                var tk = _tokens[i];
-                if (tk.type == TokenType.WhiteSpace) continue;
-                if (tk.type == TokenType.Comment) continue;
-                if (tk.type == TokenType.Char)
+                if (!_IsValidToken(i))
                 {
-                    if (ignoreSeps.Contains(tk.text)) continue;
+                    continue;
                 }
                 break;
             }
 
             return i;
+        }
+
+        private bool _IsValidToken(int idx)
+        {
+            var tk = _tokens[idx];
+            if (tk.type == TokenType.WhiteSpace) return false;
+            if (tk.type == TokenType.Comment) return false;
+            if (tk.type == TokenType.Char)
+            {
+                if (ignoreSeps.Contains(tk.text)) return false;
+            }
+
+            return true;
         }
         
         #endregion

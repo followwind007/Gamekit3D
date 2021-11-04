@@ -52,10 +52,12 @@ namespace GameApp.URPToolkit.Parser
                 {
                     case Keys.Name:
                         ReadNextQuotedString();
-                        CurPassVals.Add(new PassName { content = Cur.text});
+                        CurPassVals.Add(new ShaderPassName { content = Cur.text });
                         break;
                     case Keys.HlslBegin:
-                        ToHlslState();
+                        var hlsl = new ShaderHlsl();
+                        ToHlslState(hlsl, true);
+                        CurPassVals.Add(hlsl);
                         break;
                     default:
                         TryMatchShaderKeyword(CurPassVals);
@@ -97,30 +99,6 @@ namespace GameApp.URPToolkit.Parser
             }
         }
 
-        private void ToHlslState()
-        {
-            var startIdx = _idx;
-            var hlsl = new ShaderHlsl();
-            var hlslStart = Cur.startPosition;
-            ReadUntilIdentifier(Keys.HlslEnd);
-            var endIdx = _idx;
-            for (var i = startIdx + 1; i < _idx; i++)
-            {
-                var tk = _tokens[i];
-                _idx = i;
-                if (tk.IsIdentifier(Keys.Pragma))
-                {
-                    var pragma = new ShaderPragma { vals = ReadBrace2_s() };
-                    hlsl.vals.Add(pragma);
-                }
-            }
-
-            _idx = endIdx;
-            var hlslEnd = Cur.endPosition;
-            hlsl.content = _content.Substring(hlslStart, hlslEnd - hlslStart);
-            CurPassVals.Add(hlsl);
-        }
-
         private List<ShaderTag> ReadTags()
         {
             var tags = new List<ShaderTag>();
@@ -141,7 +119,7 @@ namespace GameApp.URPToolkit.Parser
         {
             var vals = new List<string>();
             
-            while (!IsKeyword(NextToken.text))
+            while (!IsKeyword(NextToken.text) && !NextToken.IsChar(Chars.Hash))
             {
                 var existBrace = NextToken.IsChar(Chars.BraceL2);
                 if (existBrace) ReadNextChar(Chars.BraceL2);

@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using GameApp.URPToolkit.Parser;
 using UnityEditor;
@@ -11,14 +10,14 @@ namespace GameApp.URPToolkit
         [MenuItem("Assets/Create/Shader/URP Lit Shader", false, 1001)]
         public static void CreateLitShader()
         {
-            var creator = new LitShaderCreator($"{CurSelPath}/New Lit Shader.shader");
+            var creator = new LitShaderCreator($"{CurSelPath}/NewLit.shader");
             creator.Create();
         }
 
         [MenuItem("Assets/Create/Shader/URP UnLit Shader", false, 1002)]
         public static void CreateUnLitShader()
         {
-            var creator = new UnlitShaderCreator($"{CurSelPath}/New Unlit Shader.shader");
+            var creator = new UnlitShaderCreator($"{CurSelPath}/NewUnlit.shader");
             creator.Create();
         }
 
@@ -53,6 +52,30 @@ namespace GameApp.URPToolkit
             var destPath = path.Replace(".shader", ".gen.shader");
             var generator = new ShaderGenerator(path, destPath);
             generator.Generate();
+        }
+        
+        [MenuItem("Assets/TestParserHlsl", false, 3002)]
+        public static void TestParserHlsl()
+        {
+            var sel = Selection.activeObject;
+            if (sel == null) return;
+            var path = AssetDatabase.GetAssetPath(sel);
+            var parser = new ShaderParser(path);
+            
+        }
+
+        [MenuItem("Assets/TestCreatorUnlit", false, 3003)]
+        public static void TestCreatorUnLit()
+        {
+            var creator = new UnlitShaderCreator("Assets/Shaders/NewUnlit.shader");
+            creator.Create();
+        }
+        
+        [MenuItem("Assets/TestCreatorLit", false, 3004)]
+        public static void TestCreatorLit()
+        {
+            var creator = new LitShaderCreator("Assets/Shaders/NewLit.shader");
+            creator.Create();
         }
 
         private static string CurSelPath
