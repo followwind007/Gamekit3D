@@ -54,6 +54,10 @@ namespace GameApp.URPToolkit
 
     public class ShaderInclude : ShaderBase
     {
+        public override void Generate(StringBuilder sb, int indent)
+        {
+            sb.AppendLineIndent($"{Chars.Hash}{Keys.Include} {content}", indent);
+        }
     }
 
     public class ShaderTag : ShaderBase
@@ -104,6 +108,19 @@ namespace GameApp.URPToolkit
     {
         public List<string> vals = new();
 
+        protected virtual string Key => default;
+
+        public override void Generate(StringBuilder sb, int indent)
+        {
+            sb.AppendIndent(Key, indent);
+            foreach (var v in vals)
+            {
+                sb.Append(v.StartsWith("_") ? $"{Chars.BraceL2}{v}{Chars.BraceR2}" : $" {v}");
+            }
+
+            sb.AppendLine();
+        }
+
         protected void AppendVals(StringBuilder sb)
         {
             foreach (var v in vals)
@@ -127,47 +144,27 @@ namespace GameApp.URPToolkit
 
     public class ShaderBlend : ShaderMultiValBase
     {
-        public override void Generate(StringBuilder sb, int indent)
-        {
-            sb.AppendIndent(Keys.Blend, indent);
-            AppendVals(sb, Chars.BraceL2, Chars.BraceR2);
-        }
+        protected override string Key => Keys.Blend;
     }
 
     public class ShaderZWrite : ShaderMultiValBase
     {
-        public override void Generate(StringBuilder sb, int indent)
-        {
-            sb.AppendIndent(Keys.ZWrite, indent);
-            AppendVals(sb, Chars.BraceL2, Chars.BraceR2);
-        }
+        protected override string Key => Keys.ZWrite;
     }
 
     public class ShaderZTest : ShaderMultiValBase
     {
-        public override void Generate(StringBuilder sb, int indent)
-        {
-            sb.AppendIndent(Keys.ZTest, indent);
-            AppendVals(sb);
-        }
+        protected override string Key => Keys.ZTest;
     }
 
     public class ShaderCull : ShaderMultiValBase
     {
-        public override void Generate(StringBuilder sb, int indent)
-        {
-            sb.AppendIndent(Keys.Cull, indent);
-            AppendVals(sb, Chars.BraceL2, Chars.BraceR2);
-        }
+        protected override string Key => Keys.Cull;
     }
 
     public class ShaderColorMask : ShaderMultiValBase
     {
-        public override void Generate(StringBuilder sb, int indent)
-        {
-            sb.AppendIndent(Keys.ColorMask, indent);
-            AppendVals(sb);
-        }
+        protected override string Key => Keys.ColorMask;
     }
     
     public class ShaderPragma : ShaderMultiValBase

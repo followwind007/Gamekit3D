@@ -84,7 +84,8 @@ namespace GameApp.URPToolkit.Parser
         private ShaderPass _curShaderPass;
 
         private string _content;
-        
+        public string SourcePath => _sourcePath;
+
         private HashSet<string> _keywords;
         private HashSet<string> Keywords
         {

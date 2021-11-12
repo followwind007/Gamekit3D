@@ -30,6 +30,12 @@ namespace GameApp.URPToolkit.Parser
                     var pragma = new ShaderPragma { vals = ReadBrace2_s() };
                     hlsl.vals.Add(pragma);
                 }
+                else if (tk.IsIdentifier(Keys.Include))
+                {
+                    ReadNextQuotedString();
+                    var inclue = new ShaderInclude { content = Cur.text };
+                    hlsl.vals.Add(inclue);
+                }
             }
 
             _idx = endIdx;

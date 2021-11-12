@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using GameApp.URPToolkit.Parser;
@@ -9,21 +8,44 @@ namespace GameApp.URPToolkit
 {
     public abstract class ShaderCreator
     {
+        public enum Mode
+        {
+            Create,
+            Update
+        }
+        
         public const string PackagePath = "Packages/com.unity.render-pipelines.universal";
+        
+        protected string litInput;
+        protected string litForwardPass;
+
         protected string path;
 
         protected ShaderDescriptor descriptor;
+        protected ShaderDescriptor selDescriptor;
         protected ShaderParser litInputParser;
+        protected ShaderParser forwardPassParser;
+        protected string forwardPath;
+        protected string inputPath;
 
         protected int indent;
         protected StringBuilder sb;
-        protected List<string> validPasses = new();
 
-        private static readonly HashSet<string> ValidPragmas = new() { PragmaKeys.Vertex, PragmaKeys.Fragment };
+        protected Mode mode;
 
-        protected ShaderCreator(string path)
+        private ShaderDescriptor PropDescriptor => selDescriptor ?? descriptor;
+
+        protected ShaderCreator(string path, Mode mode)
         {
             this.path = path;
+            this.mode = mode;
+            inputPath = path.Replace(".shader", "_Input.hlsl");
+            forwardPath = path.Replace(".shader", "_ForwardPass.hlsl");
+            
+            if (mode == Mode.Update)
+            {
+                selDescriptor = new ShaderParser(path).ParseShader();
+            }
         }
         
         public abstract void CreateDescriptor();
@@ -33,6 +55,8 @@ namespace GameApp.URPToolkit
             CreateDescriptor();
             sb = new StringBuilder();
             indent = 0;
+            AppendLineIndentAnno($"type:{GetType().Name}");
+            sb.AppendLine();
             AppendIndent(Keys.Shader);
             AppendSpace();
             AppendLine(descriptor.path);
@@ -40,7 +64,7 @@ namespace GameApp.URPToolkit
             
             indent++;
             
-            descriptor.GenProperty(sb, indent);
+            PropDescriptor.GenProperty(sb, indent);
             GenSubShader();
             descriptor.fallback?.Generate(sb, indent);
             descriptor.customEditor?.Generate(sb, indent);
@@ -52,14 +76,20 @@ namespace GameApp.URPToolkit
             File.WriteAllText(path, sb.ToString());
             
             CreateInput();
+            CreateForwardPass();
             AssetDatabase.Refresh();
         }
 
         public void CreateInput()
         {
             var inputText = litInputParser.CreateInput(path);
-            var inputPath = path.Replace(".shader", "_Input.hlsl");
             File.WriteAllText(inputPath, inputText);
+        }
+
+        public void CreateForwardPass()
+        {
+            var forwardPassText = File.ReadAllText(forwardPassParser.SourcePath);
+            File.WriteAllText(forwardPath, forwardPassText);
         }
 
         protected void GenSubShader()
@@ -72,7 +102,7 @@ namespace GameApp.URPToolkit
             indent++;
             foreach (var subBase in ss.vals)
             {
-                if (subBase is ShaderPass sp && validPasses.Contains(sp.Name))
+                if (subBase is ShaderPass sp)
                 {
                     AppendLineIndent(Keys.Pass);
                     AppendLineIndent(Chars.BraceL3);
@@ -80,7 +110,6 @@ namespace GameApp.URPToolkit
                     
                     foreach (var passBase in sp.vals)
                     {
-                        if (passBase is ShaderPragma) continue;
                         if (passBase is ShaderHlsl hlsl)
                         {
                             GenHlsl(hlsl);
@@ -104,12 +133,24 @@ namespace GameApp.URPToolkit
         protected void GenHlsl(ShaderHlsl hlsl)
         {
             AppendLineIndent(Keys.HlslBegin);
+            
             foreach (var hb in hlsl.vals)
             {
-                if (hb is ShaderPragma sp && ValidPragmas.Contains(sp.Type))
+                if (hb is ShaderInclude sp)
                 {
-                    //sp.Generate(sb, indent);
+                    if (sp.content.Contains(litInput))
+                    {
+                        AppendLineIndent($"{Chars.Hash}{Keys.Include} \"{inputPath}\"");
+                        continue;
+                    }
+                    else if (sp.content.Contains(litForwardPass))
+                    {
+                        AppendLineIndent($"{Chars.Hash}{Keys.Include} \"{forwardPath}\"");
+                        continue;
+                    }
                 }
+                
+                hb.Generate(sb, indent);
             }
             
             AppendLineIndent(Keys.HlslEnd);
@@ -117,6 +158,7 @@ namespace GameApp.URPToolkit
 
         protected void AppendIndent(string value) => sb.AppendIndent(value, indent);
         protected void AppendLineIndent(string value) => sb.AppendLineIndent(value, indent);
+        protected void AppendLineIndentAnno(string value) => AppendLineIndent($"/*{value}*/");
         protected void Append(string value) => sb.Append(value);
         protected void AppendLine(string value) => sb.AppendLine(value);
         protected void AppendSpace() => sb.Append(' ');
@@ -125,31 +167,37 @@ namespace GameApp.URPToolkit
 
     public class UnlitShaderCreator : ShaderCreator
     {
-        public UnlitShaderCreator(string path) : base(path) { }
+        public UnlitShaderCreator(string path, Mode mode) : base(path, mode) { }
         
         public override void CreateDescriptor()
         {
             var litParser = new ShaderParser($"{PackagePath}/Shaders/UnLit.shader");
             descriptor = litParser.ParseShader();
-            descriptor.path = "\"Hidden/CustomUnlit\"";
-            validPasses = new List<string> { "\"Unlit\"" };
+            descriptor.path = "\"CustomUnlit\"";
 
+            litInput = "UnlitInput.hlsl";
+            litForwardPass = "UnlitForwardPass.hlsl";
+        
             litInputParser = new ShaderParser($"{PackagePath}/Shaders/UnLitInput.hlsl");
+            forwardPassParser = new ShaderParser($"{PackagePath}/Shaders/UnlitForwardPass.hlsl");
         }
     }
 
     public class LitShaderCreator : ShaderCreator
     {
-        public LitShaderCreator(string path) : base(path) { }
+        public LitShaderCreator(string path, Mode mode) : base(path, mode) { }
         
         public override void CreateDescriptor()
         {
             var litParser = new ShaderParser($"{PackagePath}/Shaders/Lit.shader");
             descriptor = litParser.ParseShader();
-            descriptor.path = "\"Hidden/CustomLit\"";
-            validPasses = new List<string> { "\"ForwardLit\"" };
+            descriptor.path = "\"CustomLit\"";
             
+            litInput = "LitInput.hlsl";
+            litForwardPass = "LitForwardPass.hlsl";
+
             litInputParser = new ShaderParser($"{PackagePath}/Shaders/LitInput.hlsl");
+            forwardPassParser = new ShaderParser($"{PackagePath}/Shaders/LitForwardPass.hlsl");
         }
     }
 

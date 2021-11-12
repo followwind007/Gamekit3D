@@ -1,4 +1,5 @@
 using System.IO;
+using GameApp.URPToolkit.Draw;
 using GameApp.URPToolkit.Parser;
 using UnityEditor;
 using UnityEngine;
@@ -10,21 +11,26 @@ namespace GameApp.URPToolkit
         [MenuItem("Assets/Create/Shader/URP Lit Shader", false, 1001)]
         public static void CreateLitShader()
         {
-            var creator = new LitShaderCreator($"{CurSelPath}/NewLit.shader");
-            creator.Create();
+            ShaderCreatorWindow.OpenWindow(ShaderCreatorWindow.CreaterType.Lit);
         }
 
         [MenuItem("Assets/Create/Shader/URP UnLit Shader", false, 1002)]
         public static void CreateUnLitShader()
         {
-            var creator = new UnlitShaderCreator($"{CurSelPath}/NewUnlit.shader");
-            creator.Create();
+            ShaderCreatorWindow.OpenWindow(ShaderCreatorWindow.CreaterType.Unlit);
         }
 
-        [MenuItem("Assets/URPToolkit/Upgrade Selected Shaders", false, 2001)]
+        [MenuItem("Assets/URPToolkit/Update Selected Shaders", false, 2001)]
         public static void UpdateSelectedShaders()
         {
-            
+            foreach (var obj in Selection.objects)
+            {
+                if (obj is Shader)
+                {
+                    var path = AssetDatabase.GetAssetPath(obj);
+                    
+                }
+            }
         }
 
         [MenuItem("Assets/TestLexer", false, 3001)]
@@ -67,18 +73,18 @@ namespace GameApp.URPToolkit
         [MenuItem("Assets/TestCreatorUnlit", false, 3003)]
         public static void TestCreatorUnLit()
         {
-            var creator = new UnlitShaderCreator("Assets/Shaders/NewUnlit.shader");
+            var creator = new UnlitShaderCreator("Assets/Shaders/NewUnlit.shader", ShaderCreator.Mode.Create);
             creator.Create();
         }
         
         [MenuItem("Assets/TestCreatorLit", false, 3004)]
         public static void TestCreatorLit()
         {
-            var creator = new LitShaderCreator("Assets/Shaders/NewLit.shader");
+            var creator = new LitShaderCreator("Assets/Shaders/NewLit.shader", ShaderCreator.Mode.Create);
             creator.Create();
         }
 
-        private static string CurSelPath
+        public static string CurSelPath
         {
             get
             {
