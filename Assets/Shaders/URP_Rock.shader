@@ -1,6 +1,6 @@
 /*type:LitShaderCreator*/
 
-Shader "NewLit"
+Shader "Universal Render Pipeline/Lit"
 {
 	Properties
 	{
@@ -29,6 +29,12 @@ Shader "NewLit"
 		_DetailAlbedoMap("Detail Albedo x2", 2D) = "linearGrey" {}
 		_DetailNormalMapScale("Scale", Range(0.0,2.0)) = 1.0
 		[Normal]_DetailNormalMap("Normal Map", 2D) = "bump" {}
+		_TopMap("Top Albedo", 2D) = "white" {}
+		_TopNormalMap("Top Normal", 2D) = "white" {}
+		_TopMetallicMap("Top Metallic Map", 2D) = "white" {}
+		_TopMetallic("Top Metallic", Range(0.0,1.0)) = 1
+		_TopGlossiness("Top Glossiness", Range(0.0,1.0)) = 1
+		_TopNoiseMap("Top Noise", 2D) = "white" {}
 		[HideInInspector]_ClearCoatMask("_ClearCoatMask", Float) = 0.0
 		[HideInInspector]_ClearCoatSmoothness("_ClearCoatSmoothness", Float) = 0.0
 		_Surface("__surface", Float) = 0.0
@@ -98,8 +104,8 @@ Shader "NewLit"
 			#pragma multi_compile _ DOTS_INSTANCING_ON
 			#pragma vertex LitPassVertex
 			#pragma fragment LitPassFragment
-			#include "Assets/Shaders/NewLit_Input.hlsl"
-			#include "Assets/Shaders/NewLit_ForwardPass.hlsl"
+			#include "Assets/Shaders/URP_Rock_Input.hlsl"
+			#include "Assets/Shaders/URP_Rock_ForwardPass.hlsl"
 			ENDHLSL
 		}
 		Pass
@@ -119,7 +125,7 @@ Shader "NewLit"
 			#pragma multi_compile_vertex _ _CASTING_PUNCTUAL_LIGHT_SHADOW
 			#pragma vertex ShadowPassVertex
 			#pragma fragment ShadowPassFragment
-			#include "Assets/Shaders/NewLit_Input.hlsl"
+			#include "Assets/Shaders/URP_Rock_Input.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/Shaders/ShadowCasterPass.hlsl"
 			ENDHLSL
 		}
@@ -162,7 +168,7 @@ Shader "NewLit"
 			#pragma multi_compile _ DOTS_INSTANCING_ON
 			#pragma vertex LitGBufferPassVertex
 			#pragma fragment LitGBufferPassFragment
-			#include "Assets/Shaders/NewLit_Input.hlsl"
+			#include "Assets/Shaders/URP_Rock_Input.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/Shaders/LitGBufferPass.hlsl"
 			ENDHLSL
 		}
@@ -181,7 +187,7 @@ Shader "NewLit"
 			#pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
 			#pragma multi_compile_instancing
 			#pragma multi_compile _ DOTS_INSTANCING_ON
-			#include "Assets/Shaders/NewLit_Input.hlsl"
+			#include "Assets/Shaders/URP_Rock_Input.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/Shaders/DepthOnlyPass.hlsl"
 			ENDHLSL
 		}
@@ -202,7 +208,7 @@ Shader "NewLit"
 			#pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
 			#pragma multi_compile_instancing
 			#pragma multi_compile _ DOTS_INSTANCING_ON
-			#include "Assets/Shaders/NewLit_Input.hlsl"
+			#include "Assets/Shaders/URP_Rock_Input.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/Shaders/LitDepthNormalsPass.hlsl"
 			ENDHLSL
 		}
@@ -223,7 +229,7 @@ Shader "NewLit"
 			#pragma shader_feature_local_fragment _ _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
 			#pragma shader_feature_local _ _DETAIL_MULX2 _DETAIL_SCALED
 			#pragma shader_feature_local_fragment _SPECGLOSSMAP
-			#include "Assets/Shaders/NewLit_Input.hlsl"
+			#include "Assets/Shaders/URP_Rock_Input.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/Shaders/LitMetaPass.hlsl"
 			ENDHLSL
 		}
@@ -240,11 +246,11 @@ Shader "NewLit"
 			#pragma fragment frag
 			#pragma shader_feature_local_fragment _ALPHATEST_ON
 			#pragma shader_feature_local_fragment _ALPHAPREMULTIPLY_ON
-			#include "Assets/Shaders/NewLit_Input.hlsl"
+			#include "Assets/Shaders/URP_Rock_Input.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/Shaders/Utils/Universal2D.hlsl"
 			ENDHLSL
 		}
 	}
 	FallBack "Hidden/Universal Render Pipeline/FallbackError"
-	CustomEditor "UnityEditor.Rendering.Universal.ShaderGUI.LitShader"
+	CustomEditor "GameApp.URPToolkit.Draw.LitShaderGUI"
 }

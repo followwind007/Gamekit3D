@@ -20,16 +20,49 @@ namespace GameApp.URPToolkit
             ShaderCreatorWindow.OpenWindow(ShaderCreatorWindow.CreaterType.Unlit);
         }
 
-        [MenuItem("Assets/URPToolkit/Update Selected Shaders", false, 2001)]
+        [MenuItem("Assets/Update Selected Shaders", false, 2001)]
         public static void UpdateSelectedShaders()
         {
             foreach (var obj in Selection.objects)
             {
-                if (obj is Shader)
+                if (obj is Shader shader)
                 {
-                    var path = AssetDatabase.GetAssetPath(obj);
-                    
+                    UpdateSelectedShader(shader);
                 }
+                else if (obj is Material mt)
+                {
+                    UpdateSelectedShader(mt.shader);
+                }
+            }
+        }
+
+        public static void UpdateSelectedShader(Shader shader)
+        {
+            ShaderCreator creator = null;
+            var path = AssetDatabase.GetAssetPath(shader);
+            var lexer = new Lexer(File.ReadAllText(path));
+            var tk = lexer.Current;
+            while (tk != null && !tk.IsEnd)
+            {
+                tk = lexer.GetNextToken();
+                if (tk.type == TokenType.Comment)
+                {
+                    if (tk.text == "/*type:LitShaderCreator*/")
+                    {
+                        creator = new LitShaderCreator(path, ShaderCreator.Mode.Update);
+                        break;
+                    }
+                    else if (tk.text == "/*type:UnlitShaderCreator*/")
+                    {
+                        creator = new UnlitShaderCreator(path, ShaderCreator.Mode.Update);
+                        break;
+                    }
+                }
+            }
+
+            if (creator != null)
+            {
+                creator.Create();
             }
         }
 
@@ -67,7 +100,7 @@ namespace GameApp.URPToolkit
             if (sel == null) return;
             var path = AssetDatabase.GetAssetPath(sel);
             var parser = new ShaderParser(path);
-            
+            Debug.Log($"test parse hlsl {parser}");
         }
 
         [MenuItem("Assets/TestCreatorUnlit", false, 3003)]

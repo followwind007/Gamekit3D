@@ -34,6 +34,7 @@ namespace GameApp.URPToolkit
         protected Mode mode;
 
         private ShaderDescriptor PropDescriptor => selDescriptor ?? descriptor;
+        private ShaderDescriptor CustomEditorDescriptor => selDescriptor ?? descriptor;
 
         protected ShaderCreator(string path, Mode mode)
         {
@@ -67,7 +68,7 @@ namespace GameApp.URPToolkit
             PropDescriptor.GenProperty(sb, indent);
             GenSubShader();
             descriptor.fallback?.Generate(sb, indent);
-            descriptor.customEditor?.Generate(sb, indent);
+            CustomEditorDescriptor.customEditor?.Generate(sb, indent);
 
             indent--;
             
@@ -88,8 +89,11 @@ namespace GameApp.URPToolkit
 
         public void CreateForwardPass()
         {
-            var forwardPassText = File.ReadAllText(forwardPassParser.SourcePath);
-            File.WriteAllText(forwardPath, forwardPassText);
+            if (mode == Mode.Create)
+            {
+                var forwardPassText = File.ReadAllText(forwardPassParser.SourcePath);
+                File.WriteAllText(forwardPath, forwardPassText);
+            }
         }
 
         protected void GenSubShader()
@@ -173,7 +177,10 @@ namespace GameApp.URPToolkit
         {
             var litParser = new ShaderParser($"{PackagePath}/Shaders/UnLit.shader");
             descriptor = litParser.ParseShader();
-            descriptor.path = "\"CustomUnlit\"";
+            if (mode == Mode.Create)
+            {
+                descriptor.path = "\"CustomUnlit\"";
+            }
 
             litInput = "UnlitInput.hlsl";
             litForwardPass = "UnlitForwardPass.hlsl";
@@ -191,7 +198,10 @@ namespace GameApp.URPToolkit
         {
             var litParser = new ShaderParser($"{PackagePath}/Shaders/Lit.shader");
             descriptor = litParser.ParseShader();
-            descriptor.path = "\"CustomLit\"";
+            if (mode == Mode.Create)
+            {
+                descriptor.path = "\"CustomLit\"";
+            }
             
             litInput = "LitInput.hlsl";
             litForwardPass = "LitForwardPass.hlsl";

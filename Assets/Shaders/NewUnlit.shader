@@ -1,3 +1,5 @@
+/*type:UnlitShaderCreator*/
+
 Shader "CustomUnlit"
 {
 	Properties

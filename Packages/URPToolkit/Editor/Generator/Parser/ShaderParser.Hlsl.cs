@@ -43,7 +43,7 @@ namespace GameApp.URPToolkit.Parser
             hlsl.content = _content.Substring(hlslStart, hlslEnd - hlslStart);
         }
 
-        private static readonly HashSet<string> IgnoreCBufferProperties = new()
+        public static readonly HashSet<string> IgnoreCBufferProperties = new()
         {
             "_WorkflowMode",
             "_SmoothnessTextureChannel",
@@ -54,7 +54,36 @@ namespace GameApp.URPToolkit.Parser
             "_AlphaClip"
         };
 
-        private static readonly HashSet<string> IgnoreTexture2D = new()
+        public static readonly HashSet<string> ReservedProperties = new()
+        {
+            "_BaseMap_ST",
+            "_DetailAlbedoMap_ST",
+            "_BaseColor",
+            "_Cutoff",
+            "_Smoothness",
+            "_Metallic",
+            "_SpecColor",
+            "_BumpScale",
+            "_Parallax",
+            "_OcclusionStrength",
+            "_EmissionColor",
+            "_DetailAlbedoMapScale",
+            "_DetailNormalMapScale",
+            "_Surface",
+            "_ReceiveShadows",
+            "_QueueOffset",
+            
+            "_MetallicGlossMap",
+            "_SpecGlossMap",
+            "_ParallaxMap",
+            "_OcclusionMap",
+            "_DetailMask",
+            "_DetailAlbedoMap",
+            "_DetailNormalMap",
+            "_MainTex"
+        };
+
+        public static readonly HashSet<string> IgnoreTexture2D = new()
         {
             "_BaseMap",
             "_BumpMap",            
