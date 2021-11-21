@@ -1,6 +1,6 @@
 /*type:LitShaderCreator*/
 
-Shader "Universal Render Pipeline/Lit"
+Shader "URP_Rock"
 {
 	Properties
 	{

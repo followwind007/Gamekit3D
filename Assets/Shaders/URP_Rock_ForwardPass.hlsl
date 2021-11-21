@@ -221,15 +221,24 @@ half4 LitPassFragment(Varyings input) : SV_Target
 
     half4 noisetex = SAMPLE_TEXTURE2D(_TopNoiseMap, sampler_TopNoiseMap, uvY * _noiseScale);
     half blend =  clamp(input.normalWS.y, 0 , 1);
-    
     blend = smoothstep(noisetex.r, 1, blend);
     half noiseBlend = smoothstep(0.1, 0.2, blend);
+
+    half3 tnormalY = SampleNormal(uvY, _TopNormalMap, sampler_TopNormalMap);
+    half3 worldNormal = normalize(tnormalY.xzy);
+    half3 tangentNormal = TransformWorldToTangent(worldNormal, inputData.tangentToWorld);
     
     half4 colY = SampleAlbedoAlpha(uvY, TEXTURE2D_ARGS(_TopMap, sampler_TopMap));
 
-    
+    half4 topMetallicSmoothness = SAMPLE_TEXTURE2D(_TopMetallicMap, sampler_TopMetallicMap, uvY);
+    half4 metallicSmoothness = surfaceData.metallic;
+    half m = lerp(metallicSmoothness.r * _Metallic, noisetex.r * _TopMetallic, noiseBlend);
+    half s = lerp(metallicSmoothness.a * _Smoothness, topMetallicSmoothness.a * _TopGlossiness, noiseBlend);
 
-    surfaceData.albedo= lerp(surfaceData.albedo, colY, noiseBlend);
+    surfaceData.albedo = lerp(surfaceData.albedo, colY, noiseBlend);
+    surfaceData.metallic = m;
+    surfaceData.smoothness = s;
+    surfaceData.normalTS = lerp(surfaceData.normalTS, tangentNormal, noiseBlend);
     
 #ifdef _DBUFFER
     ApplyDecalToSurfaceData(input.positionCS, surfaceData, inputData);

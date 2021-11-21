@@ -1866,13 +1866,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9006a21f5ed5eca49a5dd2855c214b08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TopScale: 1
-  NormalDetailScale: 1
-  NoiseAmount: 1
-  NoiseFalloff: 1
-  NoiseScale: 1
-  FresnelAmount: 0.5
-  FresnelPower: 0.5
+  TopScale: 0.06
+  NormalDetailScale: 3
+  NoiseAmount: 0.5
+  NoiseFalloff: 0.02
+  NoiseScale: 3
+  FresnelAmount: 0.2
+  FresnelPower: 1
 --- !u!4 &1940530468
 Transform:
   m_ObjectHideFlags: 0

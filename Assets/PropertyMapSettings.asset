@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1019fac05a24f32a925c71febed57ae, type: 3}
+  m_Name: PropertyMapSettings
+  m_EditorClassIdentifier: 
+  maps:
+  - source: {fileID: -6465566751694194690, guid: e1db484157903ea45b6eca7b3fd412f2,
+      type: 3}
+    target: {fileID: 4800000, guid: dbbff047ab6390a45969a7c33f904374, type: 3}
+    maps:
+    - p1: _MainTex
+      p2: _BaseMap
+    - p1: _DetailBump
+      p2: _DetailNormalMapScale
+    - p1: _MetallicRough
+      p2: _MetallicGlossMap
+    - p1: _TopAlbedo
+      p2: _TopMap
+    - p1: _TopNormal
+      p2: _TopNormalMap
+    - p1: _TopMetallicRough
+      p2: _TopMetallicMap
+    - p1: _Noise
+      p2: _TopNoiseMap
+  searchPaths:
+  - Assets/3DGamekit/Art/Materials/Environment/Rock
