@@ -192,9 +192,9 @@ Varyings LitPassVertex(Attributes input)
     return output;
 }
 
-inline void InitializeStandardLitSurfaceDataWioutAlbedo(float2 uv, out SurfaceData outSurfaceData)
+inline void InitializeStandardLitSurfaceDataWithoutAlbedo(float2 uv, out SurfaceData outSurfaceData)
 {
-    half4 albedoAlpha = SampleAlbedoAlpha(uv, TEXTURE2D_ARGS(_BaseMap, sampler_BaseMap));
+    /*half4 albedoAlpha = SampleAlbedoAlpha(uv, TEXTURE2D_ARGS(_BaseMap, sampler_BaseMap));
     outSurfaceData.alpha = Alpha(albedoAlpha.a, _BaseColor, _Cutoff);
 
     half4 specGloss = SampleMetallicSpecGloss(uv, albedoAlpha.a);
@@ -209,7 +209,7 @@ inline void InitializeStandardLitSurfaceDataWioutAlbedo(float2 uv, out SurfaceDa
     #endif
 
     outSurfaceData.smoothness = specGloss.a;
-    outSurfaceData.normalTS = SampleNormal(uv, TEXTURE2D_ARGS(_BumpMap, sampler_BumpMap), _BumpScale);
+    outSurfaceData.normalTS = SampleNormal(uv, TEXTURE2D_ARGS(_BumpMap, sampler_BumpMap), _BumpScale);*/
     outSurfaceData.occlusion = SampleOcclusion(uv);
     outSurfaceData.emission = SampleEmission(uv, _EmissionColor.rgb, TEXTURE2D_ARGS(_EmissionMap, sampler_EmissionMap));
 
@@ -220,13 +220,6 @@ inline void InitializeStandardLitSurfaceDataWioutAlbedo(float2 uv, out SurfaceDa
     #else
     outSurfaceData.clearCoatMask       = half(0.0);
     outSurfaceData.clearCoatSmoothness = half(0.0);
-    #endif
-
-    #if defined(_DETAIL)
-    half detailMask = SAMPLE_TEXTURE2D(_DetailMask, sampler_DetailMask, uv).a;
-    float2 detailUv = uv * _DetailAlbedoMap_ST.xy + _DetailAlbedoMap_ST.zw;
-    outSurfaceData.albedo = ApplyDetailAlbedo(detailUv, outSurfaceData.albedo, detailMask);
-    outSurfaceData.normalTS = ApplyDetailNormal(detailUv, outSurfaceData.normalTS, detailMask);
     #endif
 }
 
@@ -247,7 +240,24 @@ half4 LitPassFragment(Varyings input) : SV_Target
 #endif
 
     SurfaceData surfaceData;
-    InitializeStandardLitSurfaceData(input.uv, surfaceData);
+    InitializeStandardLitSurfaceDataWithoutAlbedo(input.uv, surfaceData);
+
+    float2 UVY = input.positionWS.xz; 
+    half3 vertCol = input.vertexSH;
+
+    half4 Albedo01 = SampleAlbedoAlpha(UVY * _TextureScale01, TEXTURE2D_ARGS(_BaseMap, sampler_BaseMap));
+    half4 Albedo02 = SampleAlbedoAlpha(UVY * _TextureScale02, TEXTURE2D_ARGS(_Albedo02, sampler_Albedo02));
+    half4 Albedo03 = SampleAlbedoAlpha(UVY * _TextureScale02, TEXTURE2D_ARGS(_Albedo03, sampler_Albedo03));
+
+    half blend01 = smoothstep(vertCol.r, vertCol.r-_Falloff01, 1-Albedo01.a);
+    half blend02 = smoothstep(vertCol.g, vertCol.g-_Falloff02, 1-Albedo03.a);
+
+    float2 UVY2 = input.positionWS.xz;  
+    
+
+
+    Albedo02 = tex2D(_Albedo02, UVY2 * _TextureScale02);
+    Albedo03 = tex2D(_Albedo03, UVY * _TextureScale03);
 
     InputData inputData;
     InitializeInputData(input, surfaceData.normalTS, inputData);
@@ -256,10 +266,6 @@ half4 LitPassFragment(Varyings input) : SV_Target
 #ifdef _DBUFFER
     ApplyDecalToSurfaceData(input.positionCS, surfaceData, inputData);
 #endif
-
-    float2 UVY = inputData.positionWS.xz; 
-    
-    //half4 Albedo01 = surfaceData.albedo * UVY * _TextureScale01;
     
     
     half4 color = UniversalFragmentPBR(inputData, surfaceData);
