@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Text;
+using GameApp.URPToolkit.Draw;
 using GameApp.URPToolkit.Parser;
 using UnityEditor;
 
@@ -60,7 +61,7 @@ namespace GameApp.URPToolkit
             sb.AppendLine();
             AppendIndent(Keys.Shader);
             AppendSpace();
-            AppendLine(descriptor.path);
+            AppendLine(PropDescriptor.path);
             AppendLine(Chars.BraceL3);
             
             indent++;
@@ -182,6 +183,8 @@ namespace GameApp.URPToolkit
                 descriptor.path = "\"CustomUnlit\"";
             }
 
+            descriptor.customEditor = new ShaderCustomEditor { content = $"\"{typeof(UnlitShaderGUI).FullName}\"" };
+
             litInput = "UnlitInput.hlsl";
             litForwardPass = "UnlitForwardPass.hlsl";
         
@@ -202,6 +205,8 @@ namespace GameApp.URPToolkit
             {
                 descriptor.path = "\"CustomLit\"";
             }
+
+            descriptor.customEditor = new ShaderCustomEditor { content = $"\"{typeof(LitShaderGUI).FullName}\"" };
             
             litInput = "LitInput.hlsl";
             litForwardPass = "LitForwardPass.hlsl";

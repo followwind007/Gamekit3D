@@ -31,5 +31,14 @@ MonoBehaviour:
       p2: _TopMetallicMap
     - p1: _Noise
       p2: _TopNoiseMap
+  - source: {fileID: 4800000, guid: f7f335b659c92cf468c6f87e8581c34a, type: 3}
+    target: {fileID: 4800000, guid: e53211581a4e5af43a06f1063738cee3, type: 3}
+    maps:
+    - p1: _Albedo01
+      p2: _BaseMap
+    - p1: _Normal01
+      p2: _BumpMap
+    - p1: _MRHAO01
+      p2: _MetallicGlossMap
   searchPaths:
-  - Assets/3DGamekit/Art/Materials/Environment/Rock
+  - Assets/3DGamekit/Art/Materials

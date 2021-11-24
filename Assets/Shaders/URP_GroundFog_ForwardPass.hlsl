@@ -22,7 +22,6 @@ struct Attributes
     float2 texcoord     : TEXCOORD0;
     float2 staticLightmapUV   : TEXCOORD1;
     float2 dynamicLightmapUV  : TEXCOORD2;
-    float4 color : COLOR;
     UNITY_VERTEX_INPUT_INSTANCE_ID
 };
 
@@ -60,7 +59,6 @@ struct Varyings
 #endif
 
     float4 positionCS               : SV_POSITION;
-    float4 color : COLOR;
     UNITY_VERTEX_INPUT_INSTANCE_ID
     UNITY_VERTEX_OUTPUT_STEREO
 };
@@ -190,32 +188,8 @@ Varyings LitPassVertex(Attributes input)
 #endif
 
     output.positionCS = vertexInput.positionCS;
-    output.color = input.color;
 
     return output;
-}
-
-inline void InitializeStandardLitSurfaceDataWithoutAlbedo(float2 uv, out SurfaceData outSurfaceData)
-{
-    outSurfaceData = (SurfaceData)0;
-    outSurfaceData.occlusion = SampleOcclusion(uv);
-    outSurfaceData.emission = SampleEmission(uv, _EmissionColor.rgb, TEXTURE2D_ARGS(_EmissionMap, sampler_EmissionMap));
-
-    #if defined(_CLEARCOAT) || defined(_CLEARCOATMAP)
-    half2 clearCoat = SampleClearCoat(uv);
-    outSurfaceData.clearCoatMask       = clearCoat.r;
-    outSurfaceData.clearCoatSmoothness = clearCoat.g;
-    #else
-    outSurfaceData.clearCoatMask       = half(0.0);
-    outSurfaceData.clearCoatSmoothness = half(0.0);
-    #endif
-}
-
-half3 blend_rnm(half3 n1, half3 n2)
-{
-    n1.z += 1;
-    n2.xy = -n2.xy;
-    return n1 * dot(n1, n2) / n1.z - n2;
 }
 
 // Used in Standard (Physically Based) shader
@@ -235,71 +209,16 @@ half4 LitPassFragment(Varyings input) : SV_Target
 #endif
 
     SurfaceData surfaceData;
-    InitializeStandardLitSurfaceDataWithoutAlbedo(input.uv, surfaceData);
-
-    float2 UVY = input.positionWS.xz; 
-    half3 vertCol = input.color;
-
-    //Albedo
-    half4 Albedo01 = SampleAlbedoAlpha(UVY * _TextureScale01, TEXTURE2D_ARGS(_BaseMap, sampler_BaseMap));
-    half4 Albedo03 = SampleAlbedoAlpha(UVY * _TextureScale02, TEXTURE2D_ARGS(_Albedo03, sampler_Albedo03));
-
-    half blend01 = smoothstep(vertCol.r, vertCol.r-_Falloff01, 1-Albedo01.a);
-    half blend02 = smoothstep(vertCol.g, vertCol.g-_Falloff02, 1-Albedo03.a);
-
-    float2 UVY2 = input.positionWS.xz;  
-    //UVY2 += input.tangentViewDir * _ParallaxStrength * blend01;
-
-    half4 Albedo02 = SampleAlbedoAlpha(UVY2 * _TextureScale02, TEXTURE2D_ARGS(_Albedo02, sampler_Albedo02));
-    half4 AlbedoFinal = Albedo01;
-    AlbedoFinal = lerp(AlbedoFinal, Albedo02, blend01);
-    AlbedoFinal = lerp(AlbedoFinal, Albedo01, blend02);
-
-    //Normal
-    half3 Normal01 = SampleNormal(UVY * _TextureScale01, TEXTURE2D_ARGS(_BumpMap, sampler_BumpMap), _BumpScale);
-    half3 Normal02 = SampleNormal(UVY2 * _TextureScale02, TEXTURE2D_ARGS(_Normal02, sampler_Normal02), _BumpScale);
-    half3 Normal03 = SampleNormal(UVY * _TextureScale03, TEXTURE2D_ARGS(_Normal03, sampler_Normal03), _BumpScale);
-    
-    half3 absVertNormal = abs(input.normalWS);
-    half3 tangentNormal = lerp(Normal01, Normal02, blend01);
-    tangentNormal = lerp(tangentNormal, Normal03, blend02);
-    tangentNormal = blend_rnm(half3(input.normalWS.xz, absVertNormal.y), tangentNormal);
-    half3 worldNormal = normalize(tangentNormal.xzy);
+    InitializeStandardLitSurfaceData(input.uv, surfaceData);
 
     InputData inputData;
-    InitializeInputData(input, tangentNormal, inputData);
-    float3 NormalFinal = TransformWorldToTangent(worldNormal, inputData.tangentToWorld);
-    
-    //Roughness
-    half Roughness02 = SAMPLE_TEXTURE2D(_MRHAO02, sampler_MRHAO02, UVY2 * _TextureScale02).a;
-    half Roughness03 = SAMPLE_TEXTURE2D(_MRHAO03, sampler_MRHAO03, UVY * _TextureScale03).a;
-    
-    half4 RoughnessFinal = lerp(0.3, Roughness02, blend01);
-    RoughnessFinal = lerp(RoughnessFinal, Roughness03, blend02);
-
-    float blend = 1-Albedo01.a;
-
-    //Final
-    half3 upNormal = TransformWorldToTangent(float3(0,1,0), inputData.tangentToWorld);
-    AlbedoFinal = lerp(AlbedoFinal*_WaterColor, AlbedoFinal, smoothstep(input.color.a + _WaterEdge, input.color.a + 1, blend));
-    NormalFinal = lerp(upNormal, NormalFinal, smoothstep(input.color.a + _WaterEdge, input.color.a, blend));
-    RoughnessFinal = lerp(SAMPLE_TEXTURE2D(_WaterRoughness, sampler_WaterRoughness, UVY * 0.3).a * 0.95, (float)RoughnessFinal, smoothstep(input.color.a + _WaterEdge, input.color.a, blend));
-
-    surfaceData.albedo = AlbedoFinal;
-    surfaceData.metallic = 0;
-    surfaceData.smoothness = RoughnessFinal;
-    surfaceData.normalTS = NormalFinal;
-
-    surfaceData.specular = half3(0.0, 0.0, 0.0);
-    surfaceData.alpha = Alpha(AlbedoFinal.a, _BaseColor, _Cutoff);
-    
+    InitializeInputData(input, surfaceData.normalTS, inputData);
     SETUP_DEBUG_TEXTURE_DATA(inputData, input.uv, _BaseMap);
 
 #ifdef _DBUFFER
     ApplyDecalToSurfaceData(input.positionCS, surfaceData, inputData);
 #endif
-    
-    
+
     half4 color = UniversalFragmentPBR(inputData, surfaceData);
 
     color.rgb = MixFog(color.rgb, inputData.fogCoord);

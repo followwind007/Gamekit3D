@@ -1,6 +1,6 @@
 /*type:LitShaderCreator*/
 
-Shader "URP_Terrain"
+Shader "URP_GroundFog"
 {
 	Properties
 	{
@@ -29,23 +29,11 @@ Shader "URP_Terrain"
 		_DetailAlbedoMap("Detail Albedo x2", 2D) = "linearGrey" {}
 		_DetailNormalMapScale("Scale", Range(0.0,2.0)) = 1.0
 		[Normal]_DetailNormalMap("Normal Map", 2D) = "bump" {}
-		_WaterColor("Water Color", Color) = (1,1,1,1)
-		_WaterEdge("Water Edge Hardness", Range(0,1)) = 0.2
-		[NoScaleOffset]_WaterRoughness("Water Roughness", 2D) = "white" {}
-		_ParallaxStrength("Parallax Strength", Range(0,0.1)) = 0.05
-		_TextureScale01("Texture Scale 01", Float) = 1.0
-		_Falloff01("Blend Falloff 01", Range(0,1)) = 0.2
-		[NoScaleOffset]_Albedo02("Albedo 02", 2D) = "white" {}
-		[NoScaleOffset]_Normal02("Normal 02", 2D) = "bump" {}
-		[NoScaleOffset]_Normal02Detail("Normal 02 Detail", 2D) = "bump" {}
-		[NoScaleOffset]_MRHAO02("Metal/Rough/Height/AO 02", 2D) = "white" {}
-		_TextureScale02("Texture Scale 01", Float) = 1.0
-		_Falloff02("Blend Falloff 01", Range(0,1)) = 0.2
-		[NoScaleOffset]_Albedo03("Albedo 03", 2D) = "white" {}
-		[NoScaleOffset]_Normal03("Normal 03", 2D) = "bump" {}
-		[NoScaleOffset]_MRHAO03("Metal/Rough/Height/AO 03", 2D) = "white" {}
-		_TextureScale03("Texture Scale 01", Float) = 1.0
-		_Falloff03("Blend Falloff 01", Range(0,1)) = 0.2
+		_FogDepth("Fog Depth", Float) = 5
+		_EdgeBlend("Edge Blend", Range(0,1)) = 0.25
+		_DepthBlur("Depth Blur", Float) = 1
+		_Noise("Noise", 2D) = "white" {}
+		_FogCullDistance("Water Cull Distance", Float) = 1000
 		[HideInInspector]_ClearCoatMask("_ClearCoatMask", Float) = 0.0
 		[HideInInspector]_ClearCoatSmoothness("_ClearCoatSmoothness", Float) = 0.0
 		_Surface("__surface", Float) = 0.0
@@ -115,8 +103,8 @@ Shader "URP_Terrain"
 			#pragma multi_compile _ DOTS_INSTANCING_ON
 			#pragma vertex LitPassVertex
 			#pragma fragment LitPassFragment
-			#include "Assets/Shaders/URP_Terrain_Input.hlsl"
-			#include "Assets/Shaders/URP_Terrain_ForwardPass.hlsl"
+			#include "Assets/Shaders/URP_GroundFog_Input.hlsl"
+			#include "Assets/Shaders/URP_GroundFog_ForwardPass.hlsl"
 			ENDHLSL
 		}
 		Pass
@@ -136,7 +124,7 @@ Shader "URP_Terrain"
 			#pragma multi_compile_vertex _ _CASTING_PUNCTUAL_LIGHT_SHADOW
 			#pragma vertex ShadowPassVertex
 			#pragma fragment ShadowPassFragment
-			#include "Assets/Shaders/URP_Terrain_Input.hlsl"
+			#include "Assets/Shaders/URP_GroundFog_Input.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/Shaders/ShadowCasterPass.hlsl"
 			ENDHLSL
 		}
@@ -179,7 +167,7 @@ Shader "URP_Terrain"
 			#pragma multi_compile _ DOTS_INSTANCING_ON
 			#pragma vertex LitGBufferPassVertex
 			#pragma fragment LitGBufferPassFragment
-			#include "Assets/Shaders/URP_Terrain_Input.hlsl"
+			#include "Assets/Shaders/URP_GroundFog_Input.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/Shaders/LitGBufferPass.hlsl"
 			ENDHLSL
 		}
@@ -198,7 +186,7 @@ Shader "URP_Terrain"
 			#pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
 			#pragma multi_compile_instancing
 			#pragma multi_compile _ DOTS_INSTANCING_ON
-			#include "Assets/Shaders/URP_Terrain_Input.hlsl"
+			#include "Assets/Shaders/URP_GroundFog_Input.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/Shaders/DepthOnlyPass.hlsl"
 			ENDHLSL
 		}
@@ -219,7 +207,7 @@ Shader "URP_Terrain"
 			#pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
 			#pragma multi_compile_instancing
 			#pragma multi_compile _ DOTS_INSTANCING_ON
-			#include "Assets/Shaders/URP_Terrain_Input.hlsl"
+			#include "Assets/Shaders/URP_GroundFog_Input.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/Shaders/LitDepthNormalsPass.hlsl"
 			ENDHLSL
 		}
@@ -240,7 +228,7 @@ Shader "URP_Terrain"
 			#pragma shader_feature_local_fragment _ _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
 			#pragma shader_feature_local _ _DETAIL_MULX2 _DETAIL_SCALED
 			#pragma shader_feature_local_fragment _SPECGLOSSMAP
-			#include "Assets/Shaders/URP_Terrain_Input.hlsl"
+			#include "Assets/Shaders/URP_GroundFog_Input.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/Shaders/LitMetaPass.hlsl"
 			ENDHLSL
 		}
@@ -257,7 +245,7 @@ Shader "URP_Terrain"
 			#pragma fragment frag
 			#pragma shader_feature_local_fragment _ALPHATEST_ON
 			#pragma shader_feature_local_fragment _ALPHAPREMULTIPLY_ON
-			#include "Assets/Shaders/URP_Terrain_Input.hlsl"
+			#include "Assets/Shaders/URP_GroundFog_Input.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/Shaders/Utils/Universal2D.hlsl"
 			ENDHLSL
 		}

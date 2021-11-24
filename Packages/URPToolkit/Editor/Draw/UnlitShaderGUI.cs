@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace GameApp.URPToolkit.Draw
 {
-    public class LitShaderGUI : LitShaderInternal, ILitShaderGUI
+    public class UnlitShaderGUI : UnlitShaderInternal, ILitShaderGUI
     {
         private List<MaterialProperty> _customProps = new();
         public class CustomStyles
