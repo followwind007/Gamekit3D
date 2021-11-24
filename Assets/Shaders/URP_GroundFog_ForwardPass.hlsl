@@ -58,6 +58,12 @@ struct Varyings
     float2  dynamicLightmapUV : TEXCOORD9; // Dynamic lightmap UVs
 #endif
 
+    float4 projPos : TEXCOORD10;
+    float4 grabPos : TEXCOORD11;
+    float2 localDir : TEXCOORD12;
+    float4 screenPos : TEXCOORD13;
+    float depth : TEXCOORD14;
+    
     float4 positionCS               : SV_POSITION;
     UNITY_VERTEX_INPUT_INSTANCE_ID
     UNITY_VERTEX_OUTPUT_STEREO
@@ -121,6 +127,21 @@ void InitializeInputData(Varyings input, half3 normalTS, out InputData inputData
     inputData.vertexSH = input.vertexSH;
     #endif
     #endif
+}
+
+inline float4 ComputeGrabScreenPos (float4 pos) {
+    #if UNITY_UV_STARTS_AT_TOP
+    float scale = -1.0;
+    #else
+    float scale = 1.0;
+    #endif
+    float4 o = pos * 0.5f;
+    o.xy = float2(o.x, o.y*scale) + o.w;
+    #ifdef UNITY_SINGLE_PASS_STEREO
+    o.xy = TransformStereoScreenSpaceTex(o.xy, pos.w);
+    #endif
+    o.zw = pos.zw;
+    return o;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -188,6 +209,14 @@ Varyings LitPassVertex(Attributes input)
 #endif
 
     output.positionCS = vertexInput.positionCS;
+
+    output.localDir = input.positionOS.xz;
+    output.projPos = ComputeScreenPos(vertexInput.positionCS);
+    output.grabPos = ComputeGrabScreenPos(vertexInput.positionCS);
+    
+    float4 worldPos = mul(unity_ObjectToWorld, input.positionOS);
+    float3 relPos = worldPos.xyz - _WorldSpaceCameraPos.xyz;
+    output.depth = length(relPos);
 
     return output;
 }
