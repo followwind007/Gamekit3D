@@ -86,5 +86,22 @@ MonoBehaviour:
       p2: _BaseMap
     - p1: _EmissiveColor
       p2: _EmissionColor
+  - source: {fileID: 4800000, guid: 9624a55c514d0424c9483ac44daa604d, type: 3}
+    target: {fileID: 4800000, guid: c3dbb45b9969525448c5e09811c787d7, type: 3}
+    maps:
+    - p1: _Color
+      p2: _BaseColor
+    - p1: _MainTex
+      p2: _BaseMap
+    - p1: _MetallicSmooth
+      p2: _MetallicGlossMap
+    - p1: _Normal
+      p2: _BumpMap
+    - p1: _NormalScale
+      p2: _BumpScale
+    - p1: _Occlusion
+      p2: _OcclusionMap
+    - p1: _OcclusionScale
+      p2: _OcclusionStrength
   searchPaths:
   - Assets/3DGamekit/Art/Materials

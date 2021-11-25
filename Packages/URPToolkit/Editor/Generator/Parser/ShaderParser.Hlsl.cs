@@ -162,6 +162,10 @@ namespace GameApp.URPToolkit.Parser
                 {
                     sb.AppendLineIndent($"half4 {p.name};", indent);
                 }
+                else if (p.type == "Vector")
+                {
+                    sb.AppendLineIndent($"half4 {p.name};", indent);
+                }
                 else
                 {
                     throw new Exception($"Unresolved property {p.name} with type: '{p.type}'!");

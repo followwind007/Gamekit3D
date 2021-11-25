@@ -4,10 +4,11 @@
 Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_Name: Grass_03_Mat
-  m_Shader: {fileID: 4800000, guid: 9624a55c514d0424c9483ac44daa604d, type: 3}
+  m_Shader: {fileID: 4800000, guid: c3dbb45b9969525448c5e09811c787d7, type: 3}
   m_ShaderKeywords: _ALPHAPREMULTIPLY_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -18,6 +19,10 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _BaseMap:
+        m_Texture: {fileID: 2800000, guid: 4188a9f5cacb8a54aa76e21640ad6576, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _BumpMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -38,28 +43,12 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 4188a9f5cacb8a54aa76e21640ad6576, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _MetallicSmooth:
-        m_Texture: {fileID: 2800000, guid: c0a9eef1ec7fa3e419681b073350a3e4, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _Normal:
-        m_Texture: {fileID: 2800000, guid: e031e487d0803524b981dad56a1d90c6, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _Occlusion:
-        m_Texture: {fileID: 2800000, guid: e19ec2a1f2c1df340aabaaaf1d8b6741, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: e19ec2a1f2c1df340aabaaaf1d8b6741, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ParallaxMap:
@@ -70,6 +59,7 @@ Material:
         m_Texture: {fileID: 2800000, guid: 1d82da1161341d847ba4841b7dcc59f8, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    m_Ints: []
     m_Floats:
     - _BumpScale: 1
     - _Cutoff: 0.5
@@ -81,8 +71,6 @@ Material:
     - _Metallic: 0
     - _Mode: 3
     - _NoiseScale: 0.01
-    - _NormalScale: 0.5
-    - _OcclusionScale: 1
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _SmoothnessTextureChannel: 0
@@ -91,6 +79,7 @@ Material:
     - _UVSec: 0
     - _ZWrite: 0
     m_Colors:
-    - _Color: {r: 1, g: 0.28854612, b: 0.06132078, a: 1}
+    - _BaseColor: {r: 1, g: 0.28854612, b: 0.06132078, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 0}
     - _NoiseAmount: {r: 0.1, g: 0.02, b: 0.1, a: 0}
+  m_BuildTextureStacks: []
