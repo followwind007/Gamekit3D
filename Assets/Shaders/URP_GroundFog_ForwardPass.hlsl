@@ -144,6 +144,15 @@ inline float4 ComputeGrabScreenPos (float4 pos) {
     return o;
 }
 
+inline float InverseLerp(float a, float b, float value)
+{
+    return saturate((value - a) / (b - a));
+}
+
+inline half3 Blend(half3 bg, half3 fore, half alpha) {
+    return (bg * (1-alpha)) + (alpha*fore);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 //                  Vertex and Fragment functions                            //
 ///////////////////////////////////////////////////////////////////////////////
@@ -221,6 +230,8 @@ Varyings LitPassVertex(Attributes input)
     return output;
 }
 
+TEXTURE2D(_CameraDepthTexture); SAMPLER(sampler_CameraDepthTexture);
+TEXTURE2D(_CameraOpaqueTexture); SAMPLER(sampler_CameraOpaqueTexture);
 // Used in Standard (Physically Based) shader
 half4 LitPassFragment(Varyings input) : SV_Target
 {
@@ -242,6 +253,27 @@ half4 LitPassFragment(Varyings input) : SV_Target
 
     InputData inputData;
     InitializeInputData(input, surfaceData.normalTS, inputData);
+
+    float sceneZ = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, sampler_CameraDepthTexture, input.projPos.xy);
+    sceneZ = LinearEyeDepth(sceneZ, _ZBufferParams);
+    float partZ = input.projPos.z;
+    float zDiff = abs(sceneZ-partZ);
+    float fog = 1-InverseLerp(_FogDepth, 0, zDiff);
+    float fade = InverseLerp(_EdgeBlend, 0, zDiff);
+
+    float4 bgUV = input.grabPos;
+    bgUV.xy /= bgUV.w;
+    half3 bg = SAMPLE_TEXTURE2D(_CameraOpaqueTexture, sampler_CameraOpaqueTexture, bgUV.xy).rgb;
+    float distanceAlpha = 1-InverseLerp(_FogCullDistance*0.7, _FogCullDistance, input.depth);
+    float2 uv = input.uv;//
+    half n = SAMPLE_TEXTURE2D(_Noise, sampler_Noise, uv).r;
+    half nd = SAMPLE_TEXTURE2D(_Noise, sampler_Noise, uv * 5).r;
+    half3 albedo = Blend(bg, _BaseColor.rgb, fog*_BaseColor.a*(n*nd));
+
+    surfaceData.albedo = albedo;
+    surfaceData.specular = 0;
+    surfaceData.alpha = min(1-fade,distanceAlpha);
+    
     SETUP_DEBUG_TEXTURE_DATA(inputData, input.uv, _BaseMap);
 
 #ifdef _DBUFFER
