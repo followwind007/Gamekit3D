@@ -48,6 +48,19 @@ MonoBehaviour:
       p2: _TopMetallicMap
     - p1: _Noise
       p2: _TopNoiseMap
+  - source: {fileID: 4800000, guid: e95b884462a6a7a4eb11404c32625407, type: 3}
+    target: {fileID: 4800000, guid: 6c3d6535d844ea4409aa809ac4b79263, type: 3}
+    maps:
+    - p1: _MainTex
+      p2: _BaseMap
+    - p1: _DetailBump
+      p2: _DetailNormalMap
+    - p1: _MetallicRough
+      p2: _MetallicGlossMap
+    - p1: _Emission
+      p2: _EmissionMap
+    - p1: _EmissiveColor
+      p2: _EmissionColor
   - source: {fileID: 4800000, guid: f7f335b659c92cf468c6f87e8581c34a, type: 3}
     target: {fileID: 4800000, guid: e53211581a4e5af43a06f1063738cee3, type: 3}
     maps:
@@ -62,5 +75,16 @@ MonoBehaviour:
     maps:
     - p1: _Color
       p2: _BaseColor
+  - source: {fileID: 4800000, guid: e48dc3fe7602c914abada8cec9711f48, type: 3}
+    target: {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
+    maps:
+    - p1: _Color
+      p2: _BaseColor
+    - p1: _MainTex
+      p2: _BaseMap
+    - p1: _MainTex
+      p2: _BaseMap
+    - p1: _EmissiveColor
+      p2: _EmissionColor
   searchPaths:
   - Assets/3DGamekit/Art/Materials
