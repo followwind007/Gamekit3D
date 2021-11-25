@@ -136,6 +136,15 @@ Varyings LitPassVertex(Attributes input)
     UNITY_TRANSFER_INSTANCE_ID(input, output);
     UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
 
+    output.uv = TRANSFORM_TEX(input.texcoord, _BaseMap);
+
+    float3 pos = TransformObjectToWorld(input.positionOS.xyz).xyz;
+    pos.x += _Time.x * 30;
+    half4 tex = SAMPLE_TEXTURE2D_LOD(_Noise, sampler_Noise, output.uv, (pos*0.5).x);
+    half4 Gradient = SAMPLE_TEXTURE2D_LOD(_Gradient, sampler_Gradient, output.uv, input.texcoord.x);
+    float mask = smoothstep(_Cutoff, _Cutoff - 0.3, 1-Gradient.r);
+    input.positionOS.xyz += input.normalOS * tex.xyz * mask * _Cutoff * _DisplaceAmount;
+
     VertexPositionInputs vertexInput = GetVertexPositionInputs(input.positionOS.xyz);
 
     // normalWS and tangentWS already normalize.
@@ -149,8 +158,6 @@ Varyings LitPassVertex(Attributes input)
     #if !defined(_FOG_FRAGMENT)
         fogFactor = ComputeFogFactor(vertexInput.positionCS.z);
     #endif
-
-    output.uv = TRANSFORM_TEX(input.texcoord, _BaseMap);
 
     // already normalized from normal transform to WS.
     output.normalWS = normalInput.normalWS;
@@ -224,6 +231,7 @@ half4 LitPassFragment(Varyings input) : SV_Target
     color.rgb = MixFog(color.rgb, inputData.fogCoord);
     color.a = OutputAlpha(color.a, _Surface);
 
+    clip(1);
     return color;
 }
 

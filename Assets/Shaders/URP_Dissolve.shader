@@ -29,6 +29,14 @@ Shader "CustomLit"
 		_DetailAlbedoMap("Detail Albedo x2", 2D) = "linearGrey" {}
 		_DetailNormalMapScale("Scale", Range(0.0,2.0)) = 1.0
 		[Normal]_DetailNormalMap("Normal Map", 2D) = "bump" {}
+		_AO("AO", 2D) = "white" {}
+		[HDR]_EdgeColor1("Edge Color", Color) = (1,1,1,1)
+		_Noise("Noise", 2D) = "white" {}
+		[Toggle]_Use_Gradient("Use Gradient?", Float) = 1
+		_Gradient("Gradient", 2D) = "white" {}
+		_EdgeSize("EdgeSize", Range(0,1)) = 0.2
+		_NoiseStrength("Noise Strength", Range(0,1)) = 0.4
+		_DisplaceAmount("Displace Amount", Range(0,1)) = 0.4
 		[HideInInspector]_ClearCoatMask("_ClearCoatMask", Float) = 0.0
 		[HideInInspector]_ClearCoatSmoothness("_ClearCoatSmoothness", Float) = 0.0
 		_Surface("__surface", Float) = 0.0
