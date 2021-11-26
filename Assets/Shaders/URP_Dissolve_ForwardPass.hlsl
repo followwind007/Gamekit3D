@@ -199,6 +199,52 @@ Varyings LitPassVertex(Attributes input)
     return output;
 }
 
+inline void InitializeStandardLitSurfaceDataCustom(Varyings input, out SurfaceData outSurfaceData)
+{
+    float2 uv = input.uv;
+    half4 albedoAlpha = SampleAlbedoAlpha(uv, TEXTURE2D_ARGS(_BaseMap, sampler_BaseMap));
+    outSurfaceData.alpha = Alpha(albedoAlpha.a, _BaseColor, _Cutoff);
+
+    half4 specGloss = SampleMetallicSpecGloss(uv, albedoAlpha.a);
+    outSurfaceData.albedo = albedoAlpha.rgb * _BaseColor.rgb;
+
+    #if _SPECULAR_SETUP
+    outSurfaceData.metallic = half(1.0);
+    outSurfaceData.specular = specGloss.rgb;
+    #else
+    outSurfaceData.metallic = specGloss.r;
+    outSurfaceData.specular = half3(0.0, 0.0, 0.0);
+    #endif
+
+    outSurfaceData.smoothness = specGloss.a;
+    outSurfaceData.normalTS = SampleNormal(uv, TEXTURE2D_ARGS(_BumpMap, sampler_BumpMap), _BumpScale);
+    outSurfaceData.occlusion = SampleOcclusion(uv);
+
+    half3 Noise = SAMPLE_TEXTURE2D(_Noise, sampler_Noise, input.uv).rgb;
+    half3 Gradient = SAMPLE_TEXTURE2D(_Gradient, sampler_Gradient, input.uv).rgb;
+    half Edge = smoothstep(_Cutoff, _Cutoff - _EdgeSize, 1 - (Gradient.r + Noise.r * (1 - Gradient.r) * _NoiseStrength));
+    half3 EmissiveCol = _EmissionColor.rgb * outSurfaceData.alpha;
+    outSurfaceData.emission = EmissiveCol + _EdgeColor1.rgb * Edge;
+    
+    //outSurfaceData.emission = SampleEmission(uv, _EmissionColor.rgb, TEXTURE2D_ARGS(_EmissionMap, sampler_EmissionMap));
+
+    #if defined(_CLEARCOAT) || defined(_CLEARCOATMAP)
+    half2 clearCoat = SampleClearCoat(uv);
+    outSurfaceData.clearCoatMask       = clearCoat.r;
+    outSurfaceData.clearCoatSmoothness = clearCoat.g;
+    #else
+    outSurfaceData.clearCoatMask       = half(0.0);
+    outSurfaceData.clearCoatSmoothness = half(0.0);
+    #endif
+
+    #if defined(_DETAIL)
+    half detailMask = SAMPLE_TEXTURE2D(_DetailMask, sampler_DetailMask, uv).a;
+    float2 detailUv = uv * _DetailAlbedoMap_ST.xy + _DetailAlbedoMap_ST.zw;
+    outSurfaceData.albedo = ApplyDetailAlbedo(detailUv, outSurfaceData.albedo, detailMask);
+    outSurfaceData.normalTS = ApplyDetailNormal(detailUv, outSurfaceData.normalTS, detailMask);
+    #endif
+}
+
 // Used in Standard (Physically Based) shader
 half4 LitPassFragment(Varyings input) : SV_Target
 {
@@ -216,7 +262,7 @@ half4 LitPassFragment(Varyings input) : SV_Target
 #endif
 
     SurfaceData surfaceData;
-    InitializeStandardLitSurfaceData(input.uv, surfaceData);
+    InitializeStandardLitSurfaceDataCustom(input, surfaceData);
 
     InputData inputData;
     InitializeInputData(input, surfaceData.normalTS, inputData);

@@ -43,7 +43,6 @@ TEXTURE2D(_OcclusionMap); SAMPLER(sampler_OcclusionMap);
 TEXTURE2D(_DetailMask); SAMPLER(sampler_DetailMask);
 TEXTURE2D(_DetailAlbedoMap); SAMPLER(sampler_DetailAlbedoMap);
 TEXTURE2D(_DetailNormalMap); SAMPLER(sampler_DetailNormalMap);
-TEXTURE2D(_AO); SAMPLER(sampler_AO);
 TEXTURE2D(_Noise); SAMPLER(sampler_Noise);
 TEXTURE2D(_Gradient); SAMPLER(sampler_Gradient);
 TEXTURE2D(_MainTex); SAMPLER(sampler_MainTex);

@@ -103,5 +103,20 @@ MonoBehaviour:
       p2: _OcclusionMap
     - p1: _OcclusionScale
       p2: _OcclusionStrength
+  - source: {fileID: 4800000, guid: df778dfc69de7fb48809501a413b8bbf, type: 3}
+    target: {fileID: 4800000, guid: 46dde7a14539b4d46a0e19c65c7f8078, type: 3}
+    maps:
+    - p1: _Color
+      p2: _BaseColor
+    - p1: _MainTex
+      p2: _BaseMap
+    - p1: _MetallicSmooth
+      p2: _MetallicGlossMap
+    - p1: _Normal
+      p2: _BumpMap
+    - p1: _NormalScale
+      p2: _BumpScale
+    - p1: _AO
+      p2: _OcclusionMap
   searchPaths:
   - Assets/3DGamekit/Art/Materials

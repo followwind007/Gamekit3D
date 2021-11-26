@@ -4,10 +4,11 @@
 Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_Name: Chomper_Internals_Mat
-  m_Shader: {fileID: 4800000, guid: df778dfc69de7fb48809501a413b8bbf, type: 3}
+  m_Shader: {fileID: 4800000, guid: 46dde7a14539b4d46a0e19c65c7f8078, type: 3}
   m_ShaderKeywords: _GRID_ON _METALLICGLOSSMAP _NORMALMAP _PARALLAXMAP _SPECGLOSSMAP
     _USE_GRADIENT_ON
   m_LightmapFlags: 4
@@ -19,6 +20,10 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _BaseMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _BumpMap:
         m_Texture: {fileID: 2800000, guid: 937c2229d98699c4f9ac979b18b24a85, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -51,19 +56,11 @@ Material:
         m_Texture: {fileID: 2800000, guid: 5df52e676d05dab4abb346ccce727d83, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     - _MaskTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
-        m_Texture: {fileID: 2800000, guid: b777e10d28a944c4ea05d834c049bdf0, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MetallicSmooth:
         m_Texture: {fileID: 2800000, guid: b777e10d28a944c4ea05d834c049bdf0, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -75,16 +72,12 @@ Material:
         m_Texture: {fileID: 2800000, guid: 039619e8304ca2642abd7f060be738f4, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _Normal:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     - _NormalMap:
         m_Texture: {fileID: 2800000, guid: 937c2229d98699c4f9ac979b18b24a85, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
-        m_Texture: {fileID: 2800000, guid: 8b8f71b26727fd347aa7a9584bad7892, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ParallaxMap:
@@ -111,6 +104,7 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    m_Ints: []
     m_Floats:
     - _Bias: 0
     - _BlurStrength: 1
@@ -124,6 +118,7 @@ Material:
     - _DiffuseScatteringBias2: 0
     - _DiffuseScatteringContraction: 8
     - _DiffuseScatteringContraction2: 8
+    - _DisplaceAmount: 0.4
     - _DstBlend: 0
     - _EdgeLength: 5
     - _EdgeSize: 0.2
@@ -175,11 +170,12 @@ Material:
     - _WaterSlopeDamp: 0.5
     - _ZWrite: 1
     m_Colors:
-    - _Color: {r: 0.2794118, g: 0.06985295, b: 0.06985295, a: 0.903}
+    - _BaseColor: {r: 0.2794118, g: 0.06985295, b: 0.06985295, a: 0.903}
     - _Color2: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
     - _DiffuseScatteringCol: {r: 0, g: 0, b: 0, a: 1}
     - _DiffuseScatteringCol2: {r: 0, g: 0, b: 0, a: 1}
     - _EdgeColor1: {r: 0, g: 1.2620687, b: 3.0000002, a: 1}
+    - _Emission: {r: 0, g: 0, b: 0, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _EmissiveColor: {r: 0, g: 0, b: 0, a: 1}
     - _ParallaxToBaseRatio: {r: 1, g: 1, b: 0, a: 0}
@@ -194,3 +190,4 @@ Material:
     - _WaterAccumulationCracksPuddles2: {r: 0, g: 1, b: 0, a: 1}
     - _WaterColor: {r: 0, g: 0, b: 0, a: 0}
     - _WaterColor2: {r: 0, g: 0, b: 0, a: 0}
+  m_BuildTextureStacks: []
