@@ -118,5 +118,20 @@ MonoBehaviour:
       p2: _BumpScale
     - p1: _AO
       p2: _OcclusionMap
+  - source: {fileID: 4800000, guid: f2051bbb9894243a2bffdd39af887a67, type: 3}
+    target: {fileID: 4800000, guid: 30040dac44aaae14e903b0133ebac35e, type: 3}
+    maps:
+    - p1: _Color
+      p2: _BaseColor
+    - p1: _MainTex
+      p2: _BaseMap
+    - p1: _MetallicSmooth
+      p2: _MetallicGlossMap
+    - p1: _Normal
+      p2: _BumpMap
+    - p1: _NormalScale
+      p2: _BumpScale
+    - p1: _ExtraEmission
+      p2: _EmissionColor
   searchPaths:
   - Assets/3DGamekit/Art/Materials

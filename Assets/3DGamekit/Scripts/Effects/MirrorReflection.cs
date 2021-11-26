@@ -87,7 +87,7 @@ namespace Gamekit3D
             reflectionCamera.transform.position = newpos;
             var euler = camera.transform.eulerAngles;
             reflectionCamera.transform.eulerAngles = new Vector3(0, euler.y, euler.z);
-            reflectionCamera.Render();
+            //reflectionCamera.Render();
 
             GL.invertCulling = false;
             var materials = renderer.sharedMaterials;
